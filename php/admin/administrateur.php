@@ -1,11 +1,11 @@
 <?php
 session_start();
-$title = "Gestion des clients";
+$title = "Gestion des administrateur";
 include '../header.php';
 require '../database.php';
 
 // Exemple de récupération d'utilisateurs
-$stmt = $conn->prepare("SELECT id, nom, prenom, email, tel, adresse, role, datetime FROM utilisateur WHERE role = 2");
+$stmt = $conn->prepare("SELECT id, nom, prenom, email, tel, adresse, role, datetime FROM utilisateur WHERE role = 0");
 $stmt->execute();
 $result = $stmt->get_result();
 $utilisateurs = $result->fetch_all(MYSQLI_ASSOC);
@@ -14,6 +14,9 @@ $stmt->close();
 <div class="container py-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="h3"><?= $title ?></h1>
+        <a href="ajouter_admin.php" class="btn btn-primary">
+            <i class="fas fa-user-plus me-1"></i> Ajouter un administrateur
+        </a>
     </div>
 
     <div class="table-responsive shadow-sm bg-white rounded p-3">
@@ -59,10 +62,10 @@ $stmt->close();
                         </td>
                         <td><?= date('Y-m-d H:i:s', strtotime($user['datetime'])) ?></td>
                         <td class="text-center">
-                            <a href="modifier_client.php?id=<?= $user['id'] ?>" class="btn btn-sm btn-outline-success me-1">
+                            <a href="modifier_admin.php?id=<?= $user['id'] ?>" class="btn btn-sm btn-outline-success me-1">
                                 <i class="fas fa-edit"></i>
                             </a>
-                            <a href="supprimer_client.php?id=<?= $user['id'] ?>" class="btn btn-sm btn-outline-danger">
+                            <a href="supprimer_admin.php?id=<?= $user['id'] ?>" class="btn btn-sm btn-outline-danger">
                                 <i class="fas fa-trash-alt"></i>
                             </a>
                         </td>
@@ -70,7 +73,7 @@ $stmt->close();
                 <?php endforeach; ?>
                 <?php if (empty($utilisateurs)): ?>
                     <tr>
-                        <td colspan="9" class="text-center text-muted">Aucun client trouvé.</td>
+                        <td colspan="9" class="text-center text-muted">Aucun administrateur trouvé.</td>
                     </tr>
                 <?php endif; ?>
             </tbody>

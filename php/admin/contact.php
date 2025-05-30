@@ -4,7 +4,6 @@ $title = "Gestion des contacts";
 include '../header.php';
 require '../database.php';
 
-// Exemple de récupération d'utilisateurs
 $stmt = $conn->prepare("SELECT * FROM contact");
 $stmt->execute();
 $result = $stmt->get_result();
@@ -37,7 +36,7 @@ $stmt->close();
                         <td><?= htmlspecialchars($user['message']) ?></td>
                         <td><?= date('Y-m-d H:i:s', strtotime($user['datetime'])) ?></td>
                         <td class="text-center">
-                            <a href="supprimer_contact.php?id=<?= $user['idcont'] ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?');">
+                            <a href="supprimer_contact.php?idcont=<?= $user['idcont'] ?>" class="btn btn-sm btn-outline-danger">
                                 <i class="fas fa-trash-alt"></i>
                             </a>
                         </td>

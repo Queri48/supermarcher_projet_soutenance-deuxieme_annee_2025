@@ -1,7 +1,7 @@
 <?php
 session_start();
-$title = "Créer un compte";
-require 'database.php';
+$title = "Ajouter un Administrateur";
+require '../database.php';
 
 $message = "";
 
@@ -15,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $password = $_POST['password'];
     $cpassword = $_POST['cpassword'];
     $valide = 1;
-    $role = 2;
+    $role = 0;
     $datetime = date("Y-m-d H:i:s");
 
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -57,10 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['user_id'] = $user['id'];
                 $_SESSION['user_role'] = $user['role'];
 
-                // Redirection uniquement pour les clients
-                $redirect = $_SESSION['redirect_after_login'] ?? 'index.php';
-                unset($_SESSION['redirect_after_login']);
-                header("Location: $redirect");
+                header("Location: administrateur.php");
                 exit;
             } else {
                 $message = "Erreur lors de l'inscription : " . $stmt->error;
@@ -68,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 }
-include 'header.php';
+include '../header.php';
 ?>
 <div class="container py-5">
     <div class="row justify-content-center">
@@ -111,10 +108,6 @@ include 'header.php';
 
                 <button type="submit" class="btn btn-primary w-100">S'inscrire</button>
             </form>
-
-            <div class="text-center mt-3">
-                <a href="login.php">Déjà un compte ? Se connecter</a>
-            </div>
         </div>
     </div>
 </div>

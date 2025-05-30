@@ -1,6 +1,6 @@
 <?php
 session_start();
-$title = "Connexion";
+$title = "Se connecter";
 require 'database.php';
 
 $message = "";
@@ -50,7 +50,7 @@ include 'header.php';
 <div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-md-6 bg-white p-4 rounded shadow">
-            <h2 class="text-center mb-4">Se connecter</h2>
+            <h2 class="text-center mb-4"><?= $title ?></h2>
 
             <?php if (!empty($message)): ?>
                 <div class="alert alert-danger"><?= htmlspecialchars($message) ?></div>

@@ -243,15 +243,15 @@ function afficherHeaderadmin($currentPage, $isLoggedIn)
         </li>
 
         <li class="nav-item d-none d-md-block">
-            <a href="categorie.php" class="nav-link <?= ($currentPage == 'categorie.php') ? 'active fw-bold text-primary' : 'text-dark' ?>"><i class="fas fa-list"></i> Catégories</a>
+            <a href="categorie.php" class="nav-link <?= ($currentPage == 'categorie.php') ? 'active fw-bold text-primary' : 'text-dark' ?>"><i class="fas fa-list"></i> Catégorie</a>
         </li>
 
         <li class="nav-item d-none d-md-block">
-            <a href="produit.php" class="nav-link <?= ($currentPage == 'produit.php') ? 'active fw-bold text-primary' : 'text-dark' ?>"><i class="fas fa-cubes"></i> Produits</a>
+            <a href="produit.php" class="nav-link <?= ($currentPage == 'produit.php') ? 'active fw-bold text-primary' : 'text-dark' ?>"><i class="fas fa-cubes"></i> Produit</a>
         </li>
 
         <li class="nav-item d-none d-md-block">
-            <a href="promotion.php" class="nav-link <?= ($currentPage == 'promotion.php') ? 'active fw-bold text-primary' : 'text-dark' ?>"><i class="fas fa-gift"></i> Promotions</a>
+            <a href="promotion.php" class="nav-link <?= ($currentPage == 'promotion.php') ? 'active fw-bold text-primary' : 'text-dark' ?>"><i class="fas fa-gift"></i> Promotion</a>
         </li>
 
         <li class="nav-item d-none d-md-block">
@@ -259,7 +259,7 @@ function afficherHeaderadmin($currentPage, $isLoggedIn)
         </li>
 
         <li class="nav-item d-none d-md-block">
-            <a href="commande.php" class="nav-link <?= ($currentPage == 'commande.php') ? 'active fw-bold text-primary' : 'text-dark' ?>"><i class="fas fa-clipboard-list"></i> Commandes</a>
+            <a href="commande.php" class="nav-link <?= ($currentPage == 'commande.php') ? 'active fw-bold text-primary' : 'text-dark' ?>"><i class="fas fa-clipboard-list"></i> Commande</a>
         </li>
 
         <li class="nav-item dropdown d-none d-md-block">
@@ -267,11 +267,11 @@ function afficherHeaderadmin($currentPage, $isLoggedIn)
                 <i class="fas fa-cog"></i> Paramètres
             </a>
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
-                <li><a class="dropdown-item" href="admin.php">Ajouter compte administrateur</a></li>
+                <li><a class="dropdown-item" href="administrateur.php">Ajouter compte administrateur</a></li>
                 <li>
                     <hr class="dropdown-divider">
                 </li>
-                <li><a class="dropdown-item" href="employe.php">Ajouter compte employé</a></li>
+                <li><a class="dropdown-item" href="employer.php">Ajouter compte employé</a></li>
                 <li>
                     <hr class="dropdown-divider">
                 </li>
@@ -307,21 +307,21 @@ function afficherHeaderadmin($currentPage, $isLoggedIn)
                 <!-- Ajouter Accueil ici -->
                 <li class="nav-item"><a href="tableau_bord.php" class="nav-link text-dark"><i class="fas fa-tachometer-alt"></i> Tableau de bord</a></li>
                 <li class="nav-item"><a href="client.php" class="nav-link text-dark"><i class="fas fa-users"></i> Client</a></li>
-                <li class="nav-item"><a href="categorie.php" class="nav-link text-dark"><i class="fas fa-list"></i> Catégories</a></li>
-                <li class="nav-item"><a href="produit.php" class="nav-link text-dark"><i class="fas fa-cubes"></i> Produits</a></li>
-                <li class="nav-item"><a href="promotion.php" class="nav-link text-dark"><i class="fas fa-gift"></i> Promotions</a></li>
+                <li class="nav-item"><a href="categorie.php" class="nav-link text-dark"><i class="fas fa-list"></i> Catégorie</a></li>
+                <li class="nav-item"><a href="produit.php" class="nav-link text-dark"><i class="fas fa-cubes"></i> Produit</a></li>
+                <li class="nav-item"><a href="promotion.php" class="nav-link text-dark"><i class="fas fa-gift"></i> Promotion</a></li>
                 <li class="nav-item"><a href="contact.php" class="nav-link text-dark"><i class="fas fa-phone"></i> Contact</a></li>
-                <li class="nav-item"><a href="commande.php" class="nav-link text-dark"><i class="fas fa-clipboard-list"></i> Commandes</a></li>
+                <li class="nav-item"><a href="commande.php" class="nav-link text-dark"><i class="fas fa-clipboard-list"></i> Commande</a></li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown text-dark" href="#" id="userMenuMobile" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="fas fa-cog"></i> Parametres
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="userMenuMobile">
-                        <li><a class="dropdown-item" href="admin.php">Ajouter compte administrateur</a></li>
+                        <li><a class="dropdown-item" href="administrateur.php">Ajouter compte administrateur</a></li>
                         <li>
                             <hr class="dropdown-divider">
                         </li>
-                        <li><a class="dropdown-item" href="employe.php">Ajouter compte employé</a></li>
+                        <li><a class="dropdown-item" href="employer.php">Ajouter compte employé</a></li>
                         <li>
                             <hr class="dropdown-divider">
                         </li>
@@ -417,25 +417,6 @@ function includeHeaderByRole($role)
         }
     </style>
 
-    <script>
-        function validatePassword() {
-            const password = document.getElementById("password").value;
-            const cpassword = document.getElementById("cpassword").value;
-            const regex = /^(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/;
-
-            if (!regex.test(password)) {
-                alert("Le mot de passe doit contenir au moins 8 caractères, une majuscule et un chiffre.");
-                return false;
-            }
-
-            if (password !== cpassword) {
-                alert("Les mots de passe ne correspondent pas.");
-                return false;
-            }
-
-            return true;
-        }
-    </script>
 </head>
 
 <body>

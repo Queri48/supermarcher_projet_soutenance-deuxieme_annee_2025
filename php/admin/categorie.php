@@ -35,7 +35,13 @@ $stmt->close();
                 <?php foreach ($categories as $index => $user): ?>
                     <tr>
                         <td><?= $index + 1 ?></td>
-                        <td><?= htmlspecialchars($user['image']) ?></td>
+                        <td>
+                            <?php if (!empty($user['image'])): ?>
+                                <img src="data:image/jpeg;base64,<?= base64_encode($user['image']) ?>" alt="Image" style="max-width: 100px; max-height: 100px;">
+                            <?php else: ?>
+                                <span class="text-muted">Aucune image</span>
+                            <?php endif; ?>
+                        </td>
                         <td><?= htmlspecialchars($user['titre']) ?></td>
                         <td><?= htmlspecialchars($user['resume']) ?></td>
                         <td><?= htmlspecialchars($user['description']) ?></td>

@@ -28,7 +28,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $adresse = htmlspecialchars(trim($_POST['adresse']));
     $password = $_POST['password'];
     $valide = 1;
-    $role = 2;
     $datetime = date("Y-m-d H:i:s");
 
     if (!empty($password)) {

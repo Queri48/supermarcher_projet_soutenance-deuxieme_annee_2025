@@ -1,4 +1,5 @@
 <?php
+require_once 'helpers.php';
 $currentPage = basename($_SERVER['SCRIPT_NAME']);
 
 $isLoggedIn = isset($_SESSION['user_id']);
@@ -11,31 +12,31 @@ $pages = [
     'contact.php' => 'Contact',
     'panier.php' => 'Panier',
     'historique.php' => 'Historique',
-    'tableau_bord.php'=> 'Tableau de bord',
-    'categorie.php'=> 'Catégories',
-    'produit.php'=> 'Produits',
-    'commande.php'=> 'Commandes',
+    'tableau_bord.php' => 'Tableau de bord',
+    'categorie.php' => 'Catégories',
+    'produit.php' => 'Produits',
+    'commande.php' => 'Commandes',
     'connexion.php' => 'Connexion',
     'inscription.php' => 'Inscription',
     'logout.php' => 'Déconnexion',
-    'administrateur.php'=> 'Gestion Admin',
-    'client.php'=> 'Client',
-    'employer.php'=> 'Gestion Employé',
-    'ajouter_admin.php'=> 'Ajouter Admin',
-    'ajouter_employe.php'=> 'Ajouter Employé',
-    'ajouter_categorie.php'=> 'Ajouter Categorie',
-    'ajouter_produit.php'=> 'Ajouter Produit',
-    'modifier_admin.php'=> 'Modifier Admin',
-    'modifier_client.php'=> 'Modifier Client',
-    'modifier_employe.php'=> 'Modifier Employé',
-    'modifier_categorie.php'=> 'Modifier Categorie',
-    'modifier_produit.php'=> 'Modifier Produit',
-    'supprimer_admin.php'=> 'Supprimer Admin',
-    'supprimer_client.php'=> 'Supprimer Client',
-    'supprimer_employe.php'=> 'Supprimer Employé',
-    'supprimer_contact.php'=> 'Supprimer Contact',
-    'supprimer_categorie.php'=> 'Supprimer Categorie',
-    'supprimer_produit.php'=> 'Supprimer Produit',
+    'administrateur.php' => 'Gestion Admin',
+    'client.php' => 'Client',
+    'employer.php' => 'Gestion Employé',
+    'ajouter_admin.php' => 'Ajouter Admin',
+    'ajouter_employe.php' => 'Ajouter Employé',
+    'ajouter_categorie.php' => 'Ajouter Categorie',
+    'ajouter_produit.php' => 'Ajouter Produit',
+    'modifier_admin.php' => 'Modifier Admin',
+    'modifier_client.php' => 'Modifier Client',
+    'modifier_employe.php' => 'Modifier Employé',
+    'modifier_categorie.php' => 'Modifier Categorie',
+    'modifier_produit.php' => 'Modifier Produit',
+    'supprimer_admin.php' => 'Supprimer Admin',
+    'supprimer_client.php' => 'Supprimer Client',
+    'supprimer_employe.php' => 'Supprimer Employé',
+    'supprimer_contact.php' => 'Supprimer Contact',
+    'supprimer_categorie.php' => 'Supprimer Categorie',
+    'supprimer_produit.php' => 'Supprimer Produit',
     'account.php' => 'Mon Compte',
 ];
 
@@ -97,9 +98,14 @@ function afficherHeaderParDefaut($currentPage, $isLoggedIn)
             <a href="contact.php" class="nav-link <?= ($currentPage == 'contact.php') ? 'active fw-bold text-primary' : 'text-dark' ?>"><i class="fas fa-phone"></i> Contact</a>
         </li>
 
-        <li class="nav-item d-none d-md-block">
-            <a href="panier.php" class="nav-link position-relative <?= ($currentPage == 'panier.php') ? 'active fw-bold text-primary' : 'text-dark' ?>">
-                <i class="fas fa-shopping-cart"></i> Panier
+        <li class="nav-item me-2">
+            <a class="nav-link position-relative d-flex align-items-center" data-bs-toggle="offcanvas" href="#offcanvasPanier" role="button" aria-controls="offcanvasPanier">
+                <i class="fas fa-shopping-cart fa-lg"></i>
+                <span class="d-none d-md-inline ms-1">Panier</span>
+                <?php
+                $nbArticles = isset($_SESSION['panier']) ? count($_SESSION['panier']) : 0;
+                echo '<span class="position-absolute top-1 start-60 translate-middle badge rounded-pill bg-danger">' . $nbArticles . '</span>';
+                ?>
             </a>
         </li>
     </ul>
@@ -117,7 +123,6 @@ function afficherHeaderParDefaut($currentPage, $isLoggedIn)
                 <li class="nav-item"><a href="catalogue.php" class="nav-link text-dark"><i class="fas fa-list"></i> Catalogue de produits</a></li>
                 <li class="nav-item"><a href="promotion.php" class="nav-link text-dark"><i class="fas fa-gift"></i> Promotions</a></li>
                 <li class="nav-item"><a href="contact.php" class="nav-link text-dark"><i class="fas fa-phone"></i> Contact</a></li>
-                <li class="nav-item"><a href="panier.php" class="nav-link text-dark"><i class="fas fa-shopping-cart"></i> Panier</a></li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown text-dark" href="#" id="userMenuMobile" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="fas fa-user"></i> Mon Compte
@@ -130,6 +135,61 @@ function afficherHeaderParDefaut($currentPage, $isLoggedIn)
             </ul>
         </div>
     </div>
+    
+    <!-- Offcanvas panier -->
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasPanier" aria-labelledby="offcanvasPanierLabel">
+        <div class="offcanvas-header">
+            <h5 id="offcanvasPanierLabel">Votre panier</h5>
+            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"></button>
+        </div>
+        <div class="offcanvas-body">
+
+            <?php
+            $panier = isset($_SESSION['panier']) ? $_SESSION['panier'] : [];
+            $total = 0;
+
+            if (empty($panier)) {
+                echo '<p>Votre panier est vide.</p>';
+            } else {
+                foreach ($panier as $produit) {
+                    // $produit doit contenir : image, titre, quantite, prix
+                    $image = base64_encode($produit['image']);
+                    $titre = e($produit['titre']);
+                    $quantite = (int)$produit['quantite'];
+                    $prix = (float)$produit['prix'];
+                    $totalProduit = $quantite * $prix;
+                    $total += $totalProduit;
+
+                    echo '
+                <div class="d-flex mb-3 border-bottom pb-2">
+                    <img src="data:image/jpeg;base64,' . $image . '" alt="' . $titre . '" style="width: 60px; height: 60px; object-fit: cover;" class="me-3 rounded">
+                    <div class="flex-grow-1">
+                        <h6 class="mb-1">' . $titre . '</h6>
+                        <small>Quantité : ' . $quantite . '</small><br>
+                        <small>Prix unitaire : ' . number_format($prix, 0, ',', ' ') . ' FCFA</small>
+                    </div>
+                    <div class="text-end">
+                        <strong>' . number_format($totalProduit, 0, ',', ' ') . ' FCFA</strong>
+                    </div>
+                </div>';
+                }
+
+                echo '<hr>';
+                echo '<div class="d-flex justify-content-between fw-bold mb-3">
+                    <span>Total :</span>
+                    <span>' . number_format($total, 0, ',', ' ') . ' FCFA</span>
+                  </div>';
+            }
+            ?>
+
+            <div class="text-center mt-4">
+                <p class="text-muted">Connectez-vous pour finaliser votre commande :</p>
+                <a href="connexion.php" class="btn btn-primary w-100 mb-2">Se connecter</a>
+                <a href="inscription.php" class="btn btn-outline-secondary w-100">Créer un compte</a>
+            </div>
+        </div>
+    </div>
+
 <?php
 }
 
@@ -137,7 +197,7 @@ function afficherHeaderclient($currentPage, $isLoggedIn)
 {
     global $pages;
 ?>
-    <ul class="nav justify-content-between align-items-center bg-white px-4 py-2 shadow-sm flex-wrap flex-md-nowrap">
+    <ul class="nav justify-content-between align-items-center bg-white px-2 py-2 shadow-sm flex-wrap flex-md-nowrap">
 
         <li class="nav-item order-md-0">
             <img src="../images/Logo.png" alt="" class="imgh" style="height: 40px;">
@@ -186,7 +246,6 @@ function afficherHeaderclient($currentPage, $isLoggedIn)
                 <li><a class="dropdown-item" href="logout.php">Se déconnecter</a></li>
             </ul>
         </li>
-
         <li class="nav-item d-none d-md-block">
             <a href="historique.php" class="nav-link <?= ($currentPage == 'historique.php') ? 'active fw-bold text-primary' : 'text-dark' ?>"><i class="fas fa-history"></i> Historique</a>
         </li>
@@ -195,9 +254,14 @@ function afficherHeaderclient($currentPage, $isLoggedIn)
             <a href="contact.php" class="nav-link <?= ($currentPage == 'contact.php') ? 'active fw-bold text-primary' : 'text-dark' ?>"><i class="fas fa-phone"></i> Contact</a>
         </li>
 
-        <li class="nav-item d-none d-md-block">
-            <a href="panier.php" class="nav-link position-relative <?= ($currentPage == 'panier.php') ? 'active fw-bold text-primary' : 'text-dark' ?>">
-                <i class="fas fa-shopping-cart"></i> Panier
+        <li class="nav-item me-2">
+            <a class="nav-link position-relative d-flex align-items-center" data-bs-toggle="offcanvas" href="#offcanvasPanier" role="button" aria-controls="offcanvasPanier">
+                <i class="fas fa-shopping-cart fa-lg"></i>
+                <span class="d-none d-md-inline ms-1">Panier</span>
+                <?php
+                $nbArticles = isset($_SESSION['panier']) ? count($_SESSION['panier']) : 0;
+                echo '<span class="position-absolute top-1 start-60 translate-middle badge rounded-pill bg-danger">' . $nbArticles . '</span>';
+                ?>
             </a>
         </li>
     </ul>
@@ -216,7 +280,6 @@ function afficherHeaderclient($currentPage, $isLoggedIn)
                 <li class="nav-item"><a href="promotion.php" class="nav-link text-dark"><i class="fas fa-gift"></i> Promotions</a></li>
                 <li class="nav-item"><a href="historique.php" class="nav-link text-dark"><i class="fas fa-history"></i> Historique</a></li>
                 <li class="nav-item"><a href="contact.php" class="nav-link text-dark"><i class="fas fa-phone"></i> Contact</a></li>
-                <li class="nav-item"><a href="panier.php" class="nav-link text-dark"><i class="fas fa-shopping-cart"></i> Panier</a></li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown text-dark" href="#" id="userMenuMobile" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="fas fa-user-circle"></i> Mon Compte
@@ -232,6 +295,60 @@ function afficherHeaderclient($currentPage, $isLoggedIn)
             </ul>
         </div>
     </div>
+
+    <!-- Offcanvas panier -->
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasPanier" aria-labelledby="offcanvasPanierLabel">
+        <div class="offcanvas-header">
+            <h5 id="offcanvasPanierLabel">Votre panier</h5>
+            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"></button>
+        </div>
+        <div class="offcanvas-body">
+
+            <?php
+            require_once 'database.php';
+            $panier = isset($_SESSION['panier']) ? $_SESSION['panier'] : [];
+            $total = 0;
+
+            if (empty($panier)) {
+                echo '<p>Votre panier est vide.</p>';
+            } else {
+                foreach ($panier as $produit) {
+                    // $produit doit contenir : image, titre, quantite, prix
+                    $image = base64_encode($produit['image']);
+                    $titre = e($produit['titre']);
+                    $quantite = (int)$produit['quantite'];
+                    $prix = (float)$produit['prix'];
+                    $totalProduit = $quantite * $prix;
+                    $total += $totalProduit;
+
+                    echo '
+                <div class="d-flex mb-3 border-bottom pb-2">
+                    <img src="data:image/jpeg;base64,' . $image . '" alt="' . $titre . '" style="width: 60px; height: 60px; object-fit: cover;" class="me-3 rounded">
+                    <div class="flex-grow-1">
+                        <h6 class="mb-1">' . $titre . '</h6>
+                        <small>Quantité : ' . $quantite . '</small><br>
+                        <small>Prix unitaire : ' . number_format($prix, 2, ',', ' ') . ' €</small>
+                    </div>
+                    <div class="text-end">
+                        <strong>' . number_format($totalProduit, 2, ',', ' ') . ' €</strong>
+                    </div>
+                </div>';
+                }
+
+                echo '<hr>';
+                echo '<div class="d-flex justify-content-between fw-bold mb-3">
+                    <span>Total :</span>
+                    <span>' . number_format($total, 2, ',', ' ') . ' €</span>
+                  </div>';
+            }
+            ?>
+
+            <div class="text-center mt-4">
+                <a href="commander.php" class="btn btn-success w-100">Commander</a>
+            </div>
+        </div>
+    </div>
+
 <?php
 }
 
@@ -388,7 +505,7 @@ function includeHeaderByRole($role)
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= htmlspecialchars($title ?? "Super U", ENT_QUOTES, 'UTF-8') ?></title>
+    <title><?= e($title ?? "Super U") ?></title>
     <link rel="stylesheet" href="../bootstrap-5.3.3-dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="../../bootstrap-5.3.3-dist/css/bootstrap.min.css">
     <script src="../bootstrap-5.3.3-dist/js/bootstrap.bundle.min.js"></script>

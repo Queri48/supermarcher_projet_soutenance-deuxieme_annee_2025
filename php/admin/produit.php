@@ -51,13 +51,13 @@ $stmt->close();
                         <td><?= e($user['description']) ?></td>
                         <td><?= e($user['prix']) ?></td>
                         <td><?= e($user['quantite_stock']) ?></td>
-                        <td><?= e($user['categorie_titre']) ?></td>
                         <td><?= date('Y-m-d H:i:s', strtotime($user['datetime'])) ?></td>
+                        <td><?= e($user['categorie_titre']) ?></td>
                         <td class="text-center">
-                            <a href="modifier_categorie.php?id=<?= $user['idcat'] ?>" class="btn btn-sm btn-outline-success me-1">
+                            <a href="modifier_produit.php?idart=<?= $user['idart'] ?>" class="btn btn-sm btn-outline-success me-1">
                                 <i class="fas fa-edit"></i>
                             </a>
-                            <a href="supprimer_categorie.php?id=<?= $user['idcat'] ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?');">
+                            <a href="supprimer_produit.php?idart=<?= $user['idart'] ?>" class="btn btn-sm btn-outline-danger">
                                 <i class="fas fa-trash-alt"></i>
                             </a>
                         </td>

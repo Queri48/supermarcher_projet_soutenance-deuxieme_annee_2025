@@ -1,8 +1,9 @@
 <?php
 session_start();
 $title = "Gestion des employers";
-include '../header.php';
 require '../database.php';
+require_once '../helpers.php';
+include '../header.php';
 
 // Exemple de récupération d'utilisateurs
 $stmt = $conn->prepare("SELECT id, nom, prenom, email, tel, adresse, role, datetime FROM utilisateur WHERE role = 1");
@@ -38,11 +39,11 @@ $stmt->close();
                 <?php foreach ($utilisateurs as $index => $user): ?>
                     <tr>
                         <td><?= $index + 1 ?></td>
-                        <td><?= htmlspecialchars($user['nom']) ?></td>
-                        <td><?= htmlspecialchars($user['prenom']) ?></td>
-                        <td><?= htmlspecialchars($user['email']) ?></td>
-                        <td><?= htmlspecialchars($user['tel']) ?></td>
-                        <td><?= htmlspecialchars($user['adresse']) ?></td>
+                        <td><?= e($user['nom']) ?></td>
+                        <td><?= e($user['prenom']) ?></td>
+                        <td><?= e($user['email']) ?></td>
+                        <td><?= e($user['tel']) ?></td>
+                        <td><?= e($user['adresse']) ?></td>
                         <td>
                             <?php
                             switch ($user['role']) {

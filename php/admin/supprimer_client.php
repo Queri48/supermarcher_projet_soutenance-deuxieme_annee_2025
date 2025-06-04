@@ -2,6 +2,7 @@
 session_start();
 $title = "Confirmer la suppression";
 require '../database.php';
+require_once '../helpers.php';
 
 $id = $_GET['id'] ?? null;
 
@@ -40,9 +41,9 @@ include '../header.php';
             <h4 class="mb-4 text-danger text-center"><?= $title ?></h4>
             <p class="text-center">Êtes-vous sûr de vouloir supprimer l'utilisateur suivant ?</p>
             <ul class="list-group mb-4">
-                <li class="list-group-item"><strong>Nom :</strong> <?= htmlspecialchars($utilisateur['nom']) ?></li>
-                <li class="list-group-item"><strong>Prénom :</strong> <?= htmlspecialchars($utilisateur['prenom']) ?></li>
-                <li class="list-group-item"><strong>Email :</strong> <?= htmlspecialchars($utilisateur['email']) ?></li>
+                <li class="list-group-item"><strong>Nom :</strong> <?= e($utilisateur['nom']) ?></li>
+                <li class="list-group-item"><strong>Prénom :</strong> <?= e($utilisateur['prenom']) ?></li>
+                <li class="list-group-item"><strong>Email :</strong> <?= e($utilisateur['email']) ?></li>
             </ul>
             <form method="POST">
                 <div class="d-flex justify-content-between">

@@ -1,8 +1,9 @@
 <?php
 session_start();
 $title = "Gestion des contacts";
-include '../header.php';
 require '../database.php';
+require_once '../helpers.php';
+include '../header.php';
 
 $stmt = $conn->prepare("SELECT * FROM contact");
 $stmt->execute();
@@ -31,9 +32,9 @@ $stmt->close();
                 <?php foreach ($contacts as $index => $user): ?>
                     <tr>
                         <td><?= $index + 1 ?></td>
-                        <td><?= htmlspecialchars($user['nom']) ?></td>
-                        <td><?= htmlspecialchars($user['prenom']) ?></td>
-                        <td><?= htmlspecialchars($user['message']) ?></td>
+                        <td><?= e($user['nom']) ?></td>
+                        <td><?= e($user['prenom']) ?></td>
+                        <td><?= e($user['message']) ?></td>
                         <td><?= date('Y-m-d H:i:s', strtotime($user['datetime'])) ?></td>
                         <td class="text-center">
                             <a href="supprimer_contact.php?idcont=<?= $user['idcont'] ?>" class="btn btn-sm btn-outline-danger">

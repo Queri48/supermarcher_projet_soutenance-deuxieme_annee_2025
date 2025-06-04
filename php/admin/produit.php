@@ -1,8 +1,9 @@
 <?php
 session_start();
 $title = "Gestion des Articles";
-include '../header.php';
 require '../database.php';
+require_once '../helpers.php';
+include '../header.php';
 
 $stmt = $conn->prepare("SELECT a.*, c.titre AS categorie_titre FROM article a JOIN categorie c ON a.idcat = c.idcat");
 $stmt->execute();
@@ -38,13 +39,19 @@ $stmt->close();
                 <?php foreach ($articles as $index => $user): ?>
                     <tr>
                         <td><?= $index + 1 ?></td>
-                        <td><?= htmlspecialchars($user['image']) ?></td>
-                        <td><?= htmlspecialchars($user['titre']) ?></td>
-                        <td><?= htmlspecialchars($user['resume']) ?></td>
-                        <td><?= htmlspecialchars($user['description']) ?></td>
-                        <td><?= htmlspecialchars($user['prix']) ?></td>
-                        <td><?= htmlspecialchars($user['quantite_stock']) ?></td>
-                        <td><?= htmlspecialchars($user['categorie_titre']) ?></td>
+                        <td>
+                            <?php if (!empty($user['image'])): ?>
+                                <img src="data:image/jpeg;base64,<?= base64_encode($user['image']) ?>" alt="Image" style="max-width: 100px; max-height: 100px;">
+                            <?php else: ?>
+                                <span class="text-muted">Aucune image</span>
+                            <?php endif; ?>
+                        </td>
+                        <td><?= e($user['titre']) ?></td>
+                        <td><?= e($user['resume']) ?></td>
+                        <td><?= e($user['description']) ?></td>
+                        <td><?= e($user['prix']) ?></td>
+                        <td><?= e($user['quantite_stock']) ?></td>
+                        <td><?= e($user['categorie_titre']) ?></td>
                         <td><?= date('Y-m-d H:i:s', strtotime($user['datetime'])) ?></td>
                         <td class="text-center">
                             <a href="modifier_categorie.php?id=<?= $user['idcat'] ?>" class="btn btn-sm btn-outline-success me-1">

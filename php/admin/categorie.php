@@ -1,8 +1,9 @@
 <?php
 session_start();
 $title = "Gestion des Catégories";
-include '../header.php';
+require_once '../helpers.php';
 require '../database.php';
+include '../header.php';
 
 $stmt = $conn->prepare("SELECT * FROM categorie");
 $stmt->execute();
@@ -42,15 +43,15 @@ $stmt->close();
                                 <span class="text-muted">Aucune image</span>
                             <?php endif; ?>
                         </td>
-                        <td><?= htmlspecialchars($user['titre']) ?></td>
-                        <td><?= htmlspecialchars($user['resume']) ?></td>
-                        <td><?= htmlspecialchars($user['description']) ?></td>
+                        <td><?= e($user['titre']) ?></td>
+                        <td><?= e($user['resume']) ?></td>
+                        <td><?= e($user['description']) ?></td>
                         <td><?= date('Y-m-d H:i:s', strtotime($user['datetime'])) ?></td>
                         <td class="text-center">
-                            <a href="modifier_categorie.php?id=<?= $user['idcat'] ?>" class="btn btn-sm btn-outline-success me-1">
+                            <a href="modifier_categorie.php?idcat=<?= $user['idcat'] ?>" class="btn btn-sm btn-outline-success me-1">
                                 <i class="fas fa-edit"></i>
                             </a>
-                            <a href="supprimer_categorie.php?id=<?= $user['idcat'] ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?');">
+                            <a href="supprimer_categorie.php?idcat=<?= $user['idcat'] ?>" class="btn btn-sm btn-outline-danger">
                                 <i class="fas fa-trash-alt"></i>
                             </a>
                         </td>

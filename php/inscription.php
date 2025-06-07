@@ -6,7 +6,6 @@ require 'database.php';
 $message = "";
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
     $nom = htmlspecialchars(trim($_POST['nom']));
     $prenom = htmlspecialchars(trim($_POST['prenom']));
     $email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
@@ -27,6 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif ($password !== $cpassword) {
         $message = "Les mots de passe ne correspondent pas.";
     } else {
+        // Vérifie si l'email est déjà utilisé
         $stmt_check_email = $conn->prepare("SELECT * FROM utilisateur WHERE email = ? AND valide = 1");
         $stmt_check_email->bind_param("s", $email);
         $stmt_check_email->execute();
@@ -37,26 +37,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             $stmt_check_email->close();
 
-            // Hachage du mot de passe sécurisé
+            // Hachage du mot de passe
             $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
-            $stmt = $conn->prepare("INSERT INTO utilisateur (nom, prenom, email, tel, adresse, password, valide, role, datetime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->bind_param("sssssssss", $nom, $prenom, $email, $tel, $adresse, $hashed_password, $valide, $role, $datetime);
+            // Insertion de l'utilisateur
+            $stmt = $conn->prepare("INSERT INTO utilisateur (nom, prenom, email, tel, adresse, password, valide, role, datetime) 
+                                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt->bind_param("sssssssis", $nom, $prenom, $email, $tel, $adresse, $hashed_password, $valide, $role, $datetime);
 
             if ($stmt->execute()) {
-                $user_id = $stmt->insert_id;
+                $user_id = $stmt->insert_id; // Récupère l'ID nouvellement créé
                 $stmt->close();
 
-                $stmt_get_user = $conn->prepare("SELECT id, role FROM utilisateur WHERE id = ?");
-                $stmt_get_user->bind_param("i", $user_id);
-                $stmt_get_user->execute();
-                $result_user = $stmt_get_user->get_result();
-                $user = $result_user->fetch_assoc();
-                $stmt_get_user->close();
+                $_SESSION['user_id'] = $user_id;
+                $_SESSION['user_role'] = $role;
 
-                $_SESSION['user_id'] = $user['id'];
-                $_SESSION['user_role'] = $user['role'];
+                // Fusion panier session → base
+                if (isset($_SESSION['panier'])) {
+                    foreach ($_SESSION['panier'] as $item) {
+                        $idart = $item['idart'];
+                        $quantite = $item['quantite'];
 
+                        // Vérifie si le produit est déjà dans le panier BDD
+                        $stmt_check = $conn->prepare("SELECT quantite FROM panier WHERE id = ? AND idart = ?");
+                        $stmt_check->bind_param("ii", $user_id, $idart);
+                        $stmt_check->execute();
+                        $result_check = $stmt_check->get_result();
+
+                        if ($row = $result_check->fetch_assoc()) {
+                            $nouvelle_quantite = $row['quantite'] + $quantite;
+                            $stmt_update = $conn->prepare("UPDATE panier SET quantite = ? WHERE id = ? AND idart = ?");
+                            $stmt_update->bind_param("iii", $nouvelle_quantite, $user_id, $idart);
+                            $stmt_update->execute();
+                        } else {
+                            $stmt_insert = $conn->prepare("INSERT INTO panier (id, idart, quantite) VALUES (?, ?, ?)");
+                            $stmt_insert->bind_param("iii", $user_id, $idart, $quantite);
+                            $stmt_insert->execute();
+                        }
+                    }
+
+                    // Nettoie le panier session après fusion
+                    unset($_SESSION['panier']);
+                }
                 // Redirection uniquement pour les clients
                 $redirect = $_SESSION['redirect_after_login'] ?? 'index.php';
                 unset($_SESSION['redirect_after_login']);
@@ -68,8 +90,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 }
+
 include 'header.php';
 ?>
+
 <div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-md-6 bg-white p-4 rounded shadow">
@@ -105,7 +129,7 @@ include 'header.php';
                     <input type="password" class="form-control" name="password" id="password" required>
                 </div>
                 <div class="mb-3">
-                    <label for="cpassword" class="form-label"> Confirmer Mot de passe</label>
+                    <label for="cpassword" class="form-label">Confirmer Mot de passe</label>
                     <input type="password" class="form-control" name="cpassword" id="cpassword" required>
                 </div>
 

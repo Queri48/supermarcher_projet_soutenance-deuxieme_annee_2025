@@ -21,15 +21,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($user = $result->fetch_assoc()) {
             if (password_verify($password, $user['password'])) {
+                // Authentification réussie
                 $_SESSION['user_id'] = $user['id'];
                 $_SESSION['user_role'] = $user['role'];
+                $userid = $user['id']; // ⚠️ nécessaire pour le panier BDD
 
+                // Fusion du panier session -> base de données
+                if (isset($_SESSION['panier'])) {
+                    foreach ($_SESSION['panier'] as $item) {
+                        $idart = $item['idart'];
+                        $quantite = $item['quantite'];
+
+                        // Vérifie si ce produit existe déjà dans le panier BDD
+                        $stmtCheck = $conn->prepare("SELECT quantite FROM panier WHERE id = ? AND idart = ?");
+                        $stmtCheck->bind_param("ii", $userid, $idart);
+                        $stmtCheck->execute();
+                        $resultCheck = $stmtCheck->get_result();
+
+                        if ($row = $resultCheck->fetch_assoc()) {
+                            $nouvelle_quantite = $row['quantite'] + $quantite;
+                            $stmtUpdate = $conn->prepare("UPDATE panier SET quantite = ? WHERE id = ? AND idart = ?");
+                            $stmtUpdate->bind_param("iii", $nouvelle_quantite, $userid, $idart);
+                            $stmtUpdate->execute();
+                        } else {
+                            $stmtInsert = $conn->prepare("INSERT INTO panier (id, idart, quantite) VALUES (?, ?, ?)");
+                            $stmtInsert->bind_param("iii", $userid, $idart, $quantite);
+                            $stmtInsert->execute();
+                        }
+                    }
+
+                    // Nettoyage du panier session
+                    unset($_SESSION['panier']);
+                }
+
+                // Redirection selon le rôle
                 if ($user['role'] == 0) {
                     header("Location: admin/tableau_bord.php");
                 } elseif ($user['role'] == 1) {
                     header("Location: employer/tableau_bord.php");
                 } else {
-                    // Client : on redirige vers la dernière page visitée si elle existe
+                    // Redirection uniquement pour les clients
                     $redirect = $_SESSION['redirect_after_login'] ?? 'index.php';
                     unset($_SESSION['redirect_after_login']);
                     header("Location: $redirect");
@@ -45,6 +76,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->close();
     }
 }
+
 include 'header.php';
 ?>
 <div class="container py-5">

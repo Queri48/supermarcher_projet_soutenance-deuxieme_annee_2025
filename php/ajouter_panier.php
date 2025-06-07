@@ -1,88 +1,76 @@
 <?php
 session_start();
-require 'database.php';  // connexion $conn
+require 'database.php';
 require_once 'helpers.php';
 
 if (!isset($_GET['idart']) || !is_numeric($_GET['idart'])) {
-    header('Location: index.php'); // ou page d'accueil
-    exit;
-}
-
-$idart = (int)$_GET['idart'];
-$quantite = 1; // Par défaut, on ajoute 1 unité
-
-// Récupérer les infos produit (titre, prix, image...) depuis la base
-$stmt = $conn->prepare("SELECT idart, titre, prix, image FROM article WHERE idart = ?");
-$stmt->bind_param("i", $idart);
-$stmt->execute();
-$produit = $stmt->get_result()->fetch_assoc();
-$stmt->close();
-
-if (!$produit) {
-    // Produit inexistant
     header('Location: index.php');
     exit;
 }
 
-if (isset($_SESSION['user_id'])) {
-    // Utilisateur connecté => ajouter en base dans la table panier
+$idart = intval($_GET['idart']);
+$quantite = 1;
 
-    $iduser = $_SESSION['user_id']['id'];
+// Récupération de l'article
+$stmt = $conn->prepare("SELECT idart, titre, prix, image FROM article WHERE idart = ?");
+$stmt->bind_param("i", $idart);
+$stmt->execute();
+$result = $stmt->get_result();
+$produit = $result->fetch_assoc();
 
-    // Vérifier si produit déjà dans panier en base
-    $stmt = $conn->prepare("SELECT quantite FROM panier WHERE id = ? AND idart = ?");
-    $stmt->bind_param("ii", $iduser, $idart);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    if ($result->num_rows > 0) {
-        // Met à jour la quantité
-        $row = $result->fetch_assoc();
-        $newQuantite = $row['quantite'] + $quantite;
-        $stmt->close();
+if (!$produit) {
+    header('Location: index.php');
+    exit;
+}
 
-        $stmt = $conn->prepare("UPDATE panier SET quantite = ? WHERE id = ? AND idart = ?");
-        $stmt->bind_param("iii", $newQuantite, $iduser, $idart);
-        $stmt->execute();
-        $stmt->close();
+if (isset($_SESSION['user_id']) ) {
+    $id = intval($_SESSION['user_id']); // Récupération fiable de l'id utilisateur
+
+    // Vérifier si l'article est déjà dans le panier
+    $check = $conn->prepare("SELECT idpan, quantite FROM panier WHERE id = ? AND idart = ?");
+    $check->bind_param("ii", $id, $idart);
+    $check->execute();
+    $res = $check->get_result();
+
+    if ($res->num_rows > 0) {
+        $row = $res->fetch_assoc();
+        $newQuantite = $row['quantite'] + 1;
+        $update = $conn->prepare("UPDATE panier SET quantite = ? WHERE idpan = ?");
+        $update->bind_param("ii", $newQuantite, $row['idpan']);
+        $update->execute();
     } else {
-        // Insère un nouveau produit dans panier
-        $stmt->close();
-        $stmt = $conn->prepare("INSERT INTO panier (id, idart, quantite) VALUES (?, ?, ?)");
-        $stmt->bind_param("iii", $iduser, $idart, $quantite);
-        $stmt->execute();
-        $stmt->close();
+        $now = date('Y-m-d H:i:s');
+        $insert = $conn->prepare("INSERT INTO panier (id, idart, quantite, date_ajout) VALUES (?, ?, ?, ?)");
+        $insert->bind_param("iiis", $id, $idart, $quantite, $now);
+        $insert->execute();
     }
 
+    $check->close();
+    $res->free();
 } else {
-    // Non connecté => panier dans session
+    // Utilisateur non connecté
+    if (!isset($_SESSION['panier'])) $_SESSION['panier'] = [];
 
-    if (!isset($_SESSION['panier'])) {
-        $_SESSION['panier'] = [];
-    }
-
-    // Vérifier si produit existe déjà dans panier session
     $found = false;
     foreach ($_SESSION['panier'] as &$item) {
         if ($item['idart'] == $idart) {
-            $item['quantite'] += $quantite;
+            $item['quantite'] += 1;
             $found = true;
             break;
         }
     }
-    unset($item);
 
     if (!$found) {
-        // Ajouter nouveau produit au panier session avec toutes les infos nécessaires
         $_SESSION['panier'][] = [
-            'idart' => $produit['idart'],
-            'titre' => $produit['titre'],
-            'prix' => $produit['prix'],
-            'image' => $produit['image'],  // blob image pour affichage base64
-            'quantite' => $quantite
+            'idart' => $idart,
+            'quantite' => 1
         ];
     }
 }
 
-// Redirection vers la page précédente ou panier
-header('Location: ' . ($_SERVER['HTTP_REFERER'] ?? 'index.php'));
+$stmt->close();
+
+// Redirection
+$referer = $_SERVER['HTTP_REFERER'] ?? 'index.php';
+header('Location: ' . e($referer));
 exit;

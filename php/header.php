@@ -135,47 +135,87 @@ function afficherHeaderParDefaut($currentPage, $isLoggedIn)
             </ul>
         </div>
     </div>
-    
+
     <!-- Offcanvas panier -->
     <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasPanier" aria-labelledby="offcanvasPanierLabel">
         <div class="offcanvas-header">
             <h5 id="offcanvasPanierLabel">Votre panier</h5>
-            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"></button>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
         </div>
         <div class="offcanvas-body">
-
             <?php
-            $panier = isset($_SESSION['panier']) ? $_SESSION['panier'] : [];
+            require 'database.php';
             $total = 0;
+
+            if (isset($_SESSION['user_id'])) {
+                $userid = $_SESSION['user_id'];
+                $stmt = $conn->prepare("SELECT p.idpan, a.titre, a.prix, a.image, p.quantite 
+                            FROM panier p 
+                            JOIN article a ON p.idart = a.idart 
+                            WHERE p.id = ?");
+                $stmt->bind_param("i", $userid);
+                $stmt->execute();
+                $result = $stmt->get_result();
+                $panier = $result->fetch_all(MYSQLI_ASSOC);
+            } else {
+                $panier = [];
+
+                if (isset($_SESSION['panier'])) {
+                    foreach ($_SESSION['panier'] as $item) {
+                        $idart = $item['idart'];
+                        $quantite = $item['quantite'];
+
+                        // Récupère les détails de l'article
+                        $stmt = $conn->prepare("SELECT idart, titre, prix, image FROM article WHERE idart = ?");
+                        $stmt->bind_param("i", $idart);
+                        $stmt->execute();
+                        $res = $stmt->get_result();
+                        $article = $res->fetch_assoc();
+
+                        if ($article) {
+                            $article['quantite'] = $quantite;
+                            $panier[] = $article;
+                        }
+                    }
+                }
+            }
 
             if (empty($panier)) {
                 echo '<p>Votre panier est vide.</p>';
             } else {
                 foreach ($panier as $produit) {
-                    // $produit doit contenir : image, titre, quantite, prix
-                    $image = base64_encode($produit['image']);
                     $titre = e($produit['titre']);
-                    $quantite = (int)$produit['quantite'];
                     $prix = (float)$produit['prix'];
-                    $totalProduit = $quantite * $prix;
+                    $quantite = (int)$produit['quantite'];
+                    $totalProduit = $prix * $quantite;
                     $total += $totalProduit;
 
+                    $image = base64_encode($produit['image']);
+
+                    $idpan = $produit['idpan'] ?? null;
+
                     echo '
-                <div class="d-flex mb-3 border-bottom pb-2">
-                    <img src="data:image/jpeg;base64,' . $image . '" alt="' . $titre . '" style="width: 60px; height: 60px; object-fit: cover;" class="me-3 rounded">
-                    <div class="flex-grow-1">
-                        <h6 class="mb-1">' . $titre . '</h6>
-                        <small>Quantité : ' . $quantite . '</small><br>
-                        <small>Prix unitaire : ' . number_format($prix, 0, ',', ' ') . ' FCFA</small>
-                    </div>
-                    <div class="text-end">
-                        <strong>' . number_format($totalProduit, 0, ',', ' ') . ' FCFA</strong>
-                    </div>
-                </div>';
+                    <div class="d-flex align-items-center mb-3 border-bottom pb-2">
+                        <img src="data:image/jpeg;base64,' . $image . '" alt="' . $titre . '" style="width: 60px; height: 60px;" class="me-3 rounded">
+                        <div class="flex-grow-1 w-150">
+                            <h6 class="mb-1">' . $titre . '</h6>
+                            <div class="input-group input-group-sm w-100">
+                                <button class="btn btn-outline-secondary btn-decrease" data-idpan="' . $idpan . '">-</button>
+                                <input type="text" class="form-control text-center qty-input" value="' . $quantite . '" data-idpan="' . $idpan . '" readonly>
+                                <button class="btn btn-outline-secondary btn-increase" data-idpan="' . $idpan . '">+</button>
+                            </div>
+                            <small>Prix unitaire : ' . number_format($prix, 0, ',', ' ') . ' FCFA</small>
+                        </div>
+                        <div class="text-end w-50">
+                            <strong>' . number_format($totalProduit, 0, ',', ' ') . ' FCFA</strong><br>
+                            <a href="supprimer_panier.php?idpan=' . $idpan . '" class="btn btn-sm btn-link text-danger p-0 mt-1" title="Supprimer du panier">
+                                <i class="fas fa-trash-alt"></i>
+                            </a>
+                        </div>
+                    </div>';
                 }
 
-                echo '<hr>';
-                echo '<div class="d-flex justify-content-between fw-bold mb-3">
+                echo '<hr><div class="d-flex justify-content-between fw-bold mb-3">
                     <span>Total :</span>
                     <span>' . number_format($total, 0, ',', ' ') . ' FCFA</span>
                   </div>';
@@ -259,9 +299,25 @@ function afficherHeaderclient($currentPage, $isLoggedIn)
                 <i class="fas fa-shopping-cart fa-lg"></i>
                 <span class="d-none d-md-inline ms-1">Panier</span>
                 <?php
-                $nbArticles = isset($_SESSION['panier']) ? count($_SESSION['panier']) : 0;
+                require 'database.php'; // pour $conn
+
+                $nbArticles = 0;
+                if (isset($_SESSION['user_id'])) {
+                    $userid = $_SESSION['user_id'];
+                    $stmt = $conn->prepare("SELECT SUM(quantite) as total FROM panier WHERE id = ?");
+                    $stmt->bind_param("i", $userid);
+                    $stmt->execute();
+                    $result = $stmt->get_result();
+                    $row = $result->fetch_assoc();
+                    $nbArticles = $row['total'] ?? 0;
+                } elseif (isset($_SESSION['panier'])) {
+                    // pour non connecté, compter articles dans session
+                    $nbArticles = count($_SESSION['panier']);
+                }
+
                 echo '<span class="position-absolute top-1 start-60 translate-middle badge rounded-pill bg-danger">' . $nbArticles . '</span>';
                 ?>
+
             </a>
         </li>
     </ul>
@@ -300,45 +356,84 @@ function afficherHeaderclient($currentPage, $isLoggedIn)
     <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasPanier" aria-labelledby="offcanvasPanierLabel">
         <div class="offcanvas-header">
             <h5 id="offcanvasPanierLabel">Votre panier</h5>
-            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"></button>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
         </div>
         <div class="offcanvas-body">
-
             <?php
-            require_once 'database.php';
-            $panier = isset($_SESSION['panier']) ? $_SESSION['panier'] : [];
+            require 'database.php';
             $total = 0;
+
+            if (isset($_SESSION['user_id'])) {
+                $userid = $_SESSION['user_id'];
+                $stmt = $conn->prepare("SELECT p.idpan, a.titre, a.prix, a.image, p.quantite 
+                            FROM panier p 
+                            JOIN article a ON p.idart = a.idart 
+                            WHERE p.id = ?");
+                $stmt->bind_param("i", $userid);
+                $stmt->execute();
+                $result = $stmt->get_result();
+                $panier = $result->fetch_all(MYSQLI_ASSOC);
+            } else {
+                $panier = [];
+
+                if (isset($_SESSION['panier'])) {
+                    foreach ($_SESSION['panier'] as $item) {
+                        $idart = $item['idart'];
+                        $quantite = $item['quantite'];
+
+                        // Récupère les détails de l'article
+                        $stmt = $conn->prepare("SELECT idart, titre, prix, image FROM article WHERE idart = ?");
+                        $stmt->bind_param("i", $idart);
+                        $stmt->execute();
+                        $res = $stmt->get_result();
+                        $article = $res->fetch_assoc();
+
+                        if ($article) {
+                            $article['quantite'] = $quantite;
+                            $panier[] = $article;
+                        }
+                    }
+                }
+            }
 
             if (empty($panier)) {
                 echo '<p>Votre panier est vide.</p>';
             } else {
                 foreach ($panier as $produit) {
-                    // $produit doit contenir : image, titre, quantite, prix
-                    $image = base64_encode($produit['image']);
                     $titre = e($produit['titre']);
-                    $quantite = (int)$produit['quantite'];
                     $prix = (float)$produit['prix'];
-                    $totalProduit = $quantite * $prix;
+                    $quantite = (int)$produit['quantite'];
+                    $totalProduit = $prix * $quantite;
                     $total += $totalProduit;
 
+                    $image = base64_encode($produit['image']);
+
+                    $idpan = $produit['idpan'] ?? null;
+
                     echo '
-                <div class="d-flex mb-3 border-bottom pb-2">
-                    <img src="data:image/jpeg;base64,' . $image . '" alt="' . $titre . '" style="width: 60px; height: 60px; object-fit: cover;" class="me-3 rounded">
-                    <div class="flex-grow-1">
-                        <h6 class="mb-1">' . $titre . '</h6>
-                        <small>Quantité : ' . $quantite . '</small><br>
-                        <small>Prix unitaire : ' . number_format($prix, 2, ',', ' ') . ' €</small>
-                    </div>
-                    <div class="text-end">
-                        <strong>' . number_format($totalProduit, 2, ',', ' ') . ' €</strong>
-                    </div>
-                </div>';
+                    <div class="d-flex align-items-center mb-3 border-bottom pb-2">
+                        <img src="data:image/jpeg;base64,' . $image . '" alt="' . $titre . '" style="width: 60px; height: 60px;" class="me-3 rounded">
+                        <div class="flex-grow-1 w-150">
+                            <h6 class="mb-1">' . $titre . '</h6>
+                            <div class="input-group input-group-sm w-100">
+                                <button class="btn btn-outline-secondary btn-decrease" data-idpan="' . $idpan . '">-</button>
+                                <input type="text" class="form-control text-center qty-input" value="' . $quantite . '" data-idpan="' . $idpan . '" readonly>
+                                <button class="btn btn-outline-secondary btn-increase" data-idpan="' . $idpan . '">+</button>
+                            </div>
+                            <small>Prix unitaire : ' . number_format($prix, 0, ',', ' ') . ' FCFA</small>
+                        </div>
+                        <div class="text-end w-50">
+                            <strong>' . number_format($totalProduit, 0, ',', ' ') . ' FCFA</strong><br>
+                            <a href="supprimer_panier.php?idpan=' . $idpan . '" class="btn btn-sm btn-link text-danger p-0 mt-1" title="Supprimer du panier">
+                                <i class="fas fa-trash-alt"></i>
+                            </a>
+                        </div>
+                    </div>';
                 }
 
-                echo '<hr>';
-                echo '<div class="d-flex justify-content-between fw-bold mb-3">
+                echo '<hr><div class="d-flex justify-content-between fw-bold mb-3">
                     <span>Total :</span>
-                    <span>' . number_format($total, 2, ',', ' ') . ' €</span>
+                    <span>' . number_format($total, 0, ',', ' ') . ' FCFA</span>
                   </div>';
             }
             ?>
@@ -510,6 +605,7 @@ function includeHeaderByRole($role)
     <link rel="stylesheet" href="../../bootstrap-5.3.3-dist/css/bootstrap.min.css">
     <script src="../bootstrap-5.3.3-dist/js/bootstrap.bundle.min.js"></script>
     <script src="../../bootstrap-5.3.3-dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD2poYy7oT65mFuxSJNjhoA8Ozg7NBJvHI&callback=initMap" async defer></script>
     <link rel="stylesheet" href="../fontawesome-free-6.7.2-web/css/all.min.css">
     <link rel="stylesheet" href="../../fontawesome-free-6.7.2-web/css/all.min.css">
 
@@ -554,6 +650,91 @@ function includeHeaderByRole($role)
             color: var(--bs-primary) !important;
         }
     </style>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const buttons = document.querySelectorAll(".btn-decrease, .btn-increase");
+
+            buttons.forEach(button => {
+                button.addEventListener("click", function(e) {
+                    e.preventDefault();
+
+                    const idpan = this.dataset.idpan;
+                    const action = this.classList.contains("btn-increase") ? "increase" : "decrease";
+                    const input = document.querySelector(`.qty-input[data-idpan='${idpan}']`);
+
+                    fetch("modifier_quantite.php", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/x-www-form-urlencoded"
+                            },
+                            body: `idpan=${idpan}&action=${action}`
+                        })
+                        .then(response => {
+                            if (!response.ok) throw new Error("Erreur serveur");
+                            return response.text();
+                        })
+                        .then(newQty => {
+                            input.value = newQty;
+                        })
+                        .catch(error => {
+                            console.error("Erreur AJAX:", error);
+                        });
+                });
+            });
+
+            // ➕ Recharge la page après fermeture de l'offcanvas
+            const offcanvas = document.getElementById('offcanvasPanier');
+            offcanvas.addEventListener('hidden.bs.offcanvas', function() {
+                location.reload();
+            });
+        });
+    </script>
+
+    <script>
+        let map, marker;
+
+        function initMap() {
+            const defaultLocation = {
+                lat: 6.3703,
+                lng: 2.3912
+            }; // Exemple : Cotonou
+
+            map = new google.maps.Map(document.getElementById("map"), {
+                center: defaultLocation,
+                zoom: 14,
+            });
+
+            marker = new google.maps.Marker({
+                position: defaultLocation,
+                map,
+                draggable: true,
+            });
+
+            // Mettre à jour le champ adresse automatiquement
+            google.maps.event.addListener(marker, 'dragend', function() {
+                const pos = marker.getPosition();
+                document.getElementById("adresse").value = `${pos.lat()},${pos.lng()}`;
+            });
+
+            // Bouton pour obtenir l'emplacement actuel
+            document.getElementById("get-location").addEventListener("click", function() {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(position => {
+                        const location = {
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude
+                        };
+                        map.setCenter(location);
+                        marker.setPosition(location);
+                        document.getElementById("adresse").value = `${location.lat},${location.lng}`;
+                    }, () => alert("Impossible de récupérer votre position."));
+                } else {
+                    alert("La géolocalisation n'est pas supportée par ce navigateur.");
+                }
+            });
+        }
+    </script>
 
 </head>
 

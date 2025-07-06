@@ -21,14 +21,14 @@ if (!$user) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $nom = htmlspecialchars(trim($_POST['nom']));
-    $prenom = htmlspecialchars(trim($_POST['prenom']));
-    $email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
-    $tel = htmlspecialchars(trim($_POST['tel']));
-    $adresse = htmlspecialchars(trim($_POST['adresse']));
-    $password = $_POST['password'];
+    $nom = e(trim($_POST['nom']));
+    $prenom = e(trim($_POST['prenom']));
+    $email = e(filter_var($_POST['email'], FILTER_SANITIZE_EMAIL));
+    $tel = e(trim($_POST['tel']));
+    $adresse = e(trim($_POST['adresse']));
+    $password = e($_POST['password']);
     $valide = 1;
-    $datetime = date("Y-m-d H:i:s");
+    $datetime = e(date("Y-m-d H:i:s"));
 
     if (!empty($password)) {
         $password_hash = password_hash($password, PASSWORD_DEFAULT);
@@ -43,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     header("Location: employer.php");
     exit;
 }
-include '../header.php';
+include 'header.php';
 ?>
 
 <div class="container py-5">
@@ -54,27 +54,27 @@ include '../header.php';
                 <div class="row mb-3">
                     <div class="col">
                         <label class="form-label">Nom</label>
-                        <input type="text" name="nom" class="form-control" value="<?= htmlspecialchars($user['nom']) ?>" required>
+                        <input type="text" name="nom" class="form-control" value="<?= e($user['nom']) ?>" required>
                     </div>
                     <div class="col">
                         <label class="form-label">Prénom</label>
-                        <input type="text" name="prenom" class="form-control" value="<?= htmlspecialchars($user['prenom']) ?>" required>
+                        <input type="text" name="prenom" class="form-control" value="<?= e($user['prenom']) ?>" required>
                     </div>
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label">Email</label>
-                    <input type="email" name="email" class="form-control" value="<?= htmlspecialchars($user['email']) ?>" required>
+                    <input type="email" name="email" class="form-control" value="<?= e($user['email']) ?>" required>
                 </div>
 
                 <div class="row mb-3">
                     <div class="col">
                         <label class="form-label">Téléphone</label>
-                        <input type="text" name="tel" class="form-control" value="<?= htmlspecialchars($user['tel']) ?>" required>
+                        <input type="text" name="tel" class="form-control" value="<?= e($user['tel']) ?>" required>
                     </div>
                     <div class="col">
                         <label class="form-label">Adresse</label>
-                        <input type="text" name="adresse" class="form-control" value="<?= htmlspecialchars($user['adresse']) ?>" required>
+                        <input type="text" name="adresse" class="form-control" value="<?= e($user['adresse']) ?>" required>
                     </div>
                 </div>
 

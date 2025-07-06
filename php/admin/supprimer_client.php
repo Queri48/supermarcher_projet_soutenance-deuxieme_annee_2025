@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     header("Location: client.php");
     exit;
 }
-include '../header.php';
+include 'header.php';
 ?>
 
 <div class="container py-5">

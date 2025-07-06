@@ -36,7 +36,7 @@ $title = "Produits - " . e($categorie['titre']);
 
 <div class="container py-5">
     <section class="bg-white p-5 rounded shadow-sm mb-5 text-center">
-        <h1 class="display-5 text-primary"><?= e($categorie['titre']) ?></h1>
+        <h1 class="display-5 text-primary fw-bold"><?= e($categorie['titre']) ?></h1>
         <p class="lead text-muted"><?= e($categorie['description']) ?></p>
     </section>
 

@@ -82,7 +82,7 @@ include 'header.php';
         <div class="mb-3">
             <label for="adresse" class="form-label">Adresse de livraison</label>
             <div class="input-group">
-                <input type="text" name="adresse" id="adresse" class="form-control" required placeholder="Déplacez le marqueur ou utilisez votre position actuelle">
+                <input type="text" name="adresse_livraison" id="adresse_livraison" class="form-control" required placeholder="Déplacez le marqueur ou utilisez votre position actuelle">
                 <button type="button" id="get-location" class="btn btn-outline-primary">Mon emplacement</button>
             </div>
             <div id="map" style="height: 300px; margin-top: 10px;"></div>
@@ -94,7 +94,8 @@ include 'header.php';
                 <option value="">-- Choisir une méthode --</option>
                 <option value="mtn">MTN Mobile Money</option>
                 <option value="moov">Moov Money</option>
-                <option value="celtiis">Celtiis Pay</option>
+                <option value="celtiis">Celtiis Cash</option>
+                <option value="livraison">Paiement à la livraison</option>
             </select>
         </div>
 
@@ -105,7 +106,7 @@ include 'header.php';
                    placeholder="Ex: 01xxxxxxxx">
         </div>
 
-        <input type="hidden" name="montant" value="<?= $total ?>">
+        <input type="hidden" name="montant_total" value="<?= $total ?>">
 
         <div class="text-center">
             <button type="submit" class="btn btn-success w-50">

@@ -19,12 +19,11 @@ $stmt->close();
 
 <div class="container py-5">
     <section class="bg-light p-5 rounded shadow mb-5 text-center">
-        <h1 class="display-5 mb-3"><?= $title ?></h1>
+        <h1 class="display-5 mb-3 text-primary fw-bold"><?= $title ?></h1>
         <p class="lead text-muted">
-            Chez Super U, nous croyons que faire les courses doit être un plaisir. Notre catalogue vous propose une large
-            sélection de produits soigneusement classés par catégories. Vous trouverez tout ce dont vous avez besoin :
-            de l'épicerie du quotidien aux produits frais, en passant par les promotions exceptionnelles. Cliquez sur une catégorie
-            pour découvrir en détail ce qu’elle contient. La qualité, le choix et le prix juste sont toujours au rendez-vous !
+            Chez Super U, faire les courses devient un plaisir grâce à un large choix de produits classés 
+            par catégories. Découvrez l’essentiel du quotidien, des produits frais et des offres promotionnelles. 
+            La qualité, le choix et le prix juste sont toujours au rendez-vous 
         </p>
     </section>
     <div class="row g-4">

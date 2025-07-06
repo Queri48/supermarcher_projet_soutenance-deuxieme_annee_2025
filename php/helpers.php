@@ -1,6 +1,6 @@
 <?php
 // Sécurise les sorties HTML (empêche les failles XSS)
 function e($string) {
-    return htmlspecialchars($string, ENT_QUOTES, 'UTF-8');
+    return htmlspecialchars(html_entity_decode($string), ENT_QUOTES, 'UTF-8');
 }
 

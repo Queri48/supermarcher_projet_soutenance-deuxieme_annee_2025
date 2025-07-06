@@ -2,12 +2,13 @@
 session_start();
 $title = "Se connecter";
 require 'database.php';
+require_once 'helpers.php';
 
 $message = "";
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
-    $password = $_POST['password'];
+    $email = e(filter_var($_POST['email'], FILTER_SANITIZE_EMAIL));
+    $password = e($_POST['password']);
 
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $message = "Adresse email invalide.";
@@ -95,14 +96,19 @@ include 'header.php';
                 </div>
                 <div class="mb-3">
                     <label for="password" class="form-label">Mot de passe</label>
-                    <input type="password" class="form-control" name="password" id="password" required>
+                    <div class="input-group">
+                        <input type="password" class="form-control" id="password" name="password" required>
+                        <span class="input-group-text bg-white border-start-0 bn" style="background: none;">
+                            <i class="fa fa-eye" id="togglePassword" style="cursor: pointer;"></i>
+                        </span>
+                    </div>
                 </div>
 
                 <button type="submit" class="btn btn-primary w-100">Se connecter</button>
             </form>
 
             <div class="text-center mt-3">
-                <a href="register.php">Pas encore de compte ? S'inscrire</a>
+                <a href="inscription.php">Pas encore de compte ? S'inscrire</a>
             </div>
         </div>
     </div>

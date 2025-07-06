@@ -2,18 +2,18 @@
 session_start();
 $title = "Ajouter un nouveau produit";
 require '../database.php';
+require '../helpers.php';
 $message = "";
 
-// Récupération des catégories pour la liste déroulante
-$categories = $conn->query("SELECT idcat, titre FROM categorie")->fetch_all(MYSQLI_ASSOC);
+$categories = $conn->query("SELECT idcat, titre FROM categorie ORDER BY titre asc")->fetch_all(MYSQLI_ASSOC);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $titre = htmlspecialchars($_POST['titre']);
-    $resume = htmlspecialchars($_POST['resume']);
-    $description = htmlspecialchars($_POST['description']);
-    $prix = floatval($_POST['prix']);
-    $quantite_stock = intval($_POST['quantite_stock']);
-    $idcat = intval($_POST['idcat']);
+    $titre = e($_POST['titre']);
+    $resume = e($_POST['resume']);
+    $description = e($_POST['description']);
+    $prix = e(floatval($_POST['prix']));
+    $quantite_stock = e(intval($_POST['quantite_stock']));
+    $idcat = e(intval($_POST['idcat']));
 
     // Gérer l'image
     $imageData = null;
@@ -35,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $message = "Veuillez sélectionner une image valide.";
     }
 }
-include '../header.php';
+include 'header.php';
 ?>
 
 <div class="container py-5">
@@ -83,7 +83,7 @@ include '../header.php';
                     <select name="idcat" id="idcat" class="form-select" required>
                         <option value="">Choisir une catégorie</option>
                         <?php foreach ($categories as $cat): ?>
-                            <option value="<?= $cat['idcat'] ?>"><?= htmlspecialchars($cat['titre']) ?></option>
+                            <option value="<?= $cat['idcat'] ?>"><?= e($cat['titre']) ?></option>
                         <?php endforeach; ?>
                     </select>
                 </div>

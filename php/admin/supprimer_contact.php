@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     header("Location: contact.php");
     exit;
 }
-include '../header.php';
+include 'header.php';
 ?>
 
 <div class="container py-5">
@@ -41,8 +41,8 @@ include '../header.php';
             <h4 class="mb-4 text-danger text-center"><?= $title ?></h4>
             <p class="text-center">Êtes-vous sûr de vouloir supprimer le contact suivant ?</p>
             <ul class="list-group mb-4">
-                <li class="list-group-item"><strong>Nom :</strong> <?= e($contact['nom']) ?></li>
-                <li class="list-group-item"><strong>Prénom :</strong> <?= e($contact['prenom']) ?></li>
+                <li class="list-group-item"><strong>Nom et Prénom :</strong> <?= e($contact['nom_prenom']) ?></li>
+                <li class="list-group-item"><strong>email :</strong> <?= e($contact['email']) ?></li>
                 <li class="list-group-item"><strong>message :</strong> <?= e($contact['message']) ?></li>
             </ul>
             <form method="POST">

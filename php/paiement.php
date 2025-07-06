@@ -7,15 +7,15 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
-if (!isset($_GET['idcom']) || !is_numeric($_GET['idcom'])) {
+if (!isset($_GET['idcmd']) || !is_numeric($_GET['idcmd'])) {
     die("Commande invalide.");
 }
 
-$idcom = (int)$_GET['idcom'];
+$idcom = (int)$_GET['idcmd'];
 $user_id = $_SESSION['user_id'];
 
 // Vérifier que la commande appartient à l'utilisateur
-$stmt = $conn->prepare("SELECT * FROM commande WHERE idcom = ? AND id = ?");
+$stmt = $conn->prepare("SELECT * FROM commande WHERE idcmd = ? AND id = ?");
 $stmt->bind_param("ii", $idcom, $user_id);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -26,7 +26,7 @@ if (!$commande) {
 }
 
 // Informations de paiement
-$stmt = $conn->prepare("SELECT * FROM paiement WHERE idcom = ?");
+$stmt = $conn->prepare("SELECT * FROM paiement WHERE idcmd = ?");
 $stmt->bind_param("i", $idcom);
 $stmt->execute();
 $paiement = $stmt->get_result()->fetch_assoc();
@@ -42,10 +42,10 @@ include 'header.php';
         <div class="card-body">
             <h5 class="card-title">Détails de la commande</h5>
             <ul class="list-group list-group-flush">
-                <li class="list-group-item">Commande n° <?= $commande['idcom'] ?></li>
+                <li class="list-group-item">Commande n° <?= $commande['idcmd'] ?></li>
                 <li class="list-group-item">Montant total : <?= number_format($commande['montant_total'], 0, ',', ' ') ?> FCFA</li>
-                <li class="list-group-item">Méthode de paiement : <?= strtoupper($paiement['mode_paiement']) ?></li>
-                <li class="list-group-item">Téléphone : <?= htmlspecialchars($paiement['numero_tel']) ?></li>
+                <li class="list-group-item">Méthode de paiement : <?= strtoupper($paiement['methode_paiement']) ?></li>
+                <li class="list-group-item">Téléphone : 0<?= htmlspecialchars($paiement['numero']) ?></li>
                 <li class="list-group-item">Statut : <?= ucfirst($paiement['statut']) ?></li>
             </ul>
         </div>

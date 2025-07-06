@@ -3,7 +3,7 @@ session_start();
 $title = "Gestion des clients";
 require '../database.php';
 require_once '../helpers.php';
-include '../header.php';
+include 'header.php';
 
 // Exemple de récupération d'utilisateurs
 $stmt = $conn->prepare("SELECT id, nom, prenom, email, tel, adresse, role, datetime FROM utilisateur WHERE role = 2");
@@ -14,7 +14,15 @@ $stmt->close();
 ?>
 <div class="container py-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h3"><?= $title ?></h1>
+        <h1 class="h3"><?= e($title) ?></h1>
+        <li class="nav-item d-flex align-items-center flex-grow-1 mx-1 order-0" style="max-width: 160px;" id="lirech">
+            <form class="input-group w-100" action="catalogue.php" method="GET">
+                <input class="form-control" type="search" name="recherche" id="recherche" placeholder="Recherche" aria-label="Search" style="height: 38px;">
+                <button class="btn btn-primary d-flex align-items-center justify-content-center" type="submit" style="height: 38px; width: 45px;">
+                    <i class="fas fa-search text-white"></i>
+                </button>
+            </form>
+        </li>
     </div>
 
     <div class="table-responsive shadow-sm bg-white rounded p-3">

@@ -2,12 +2,13 @@
 session_start();
 $title = "Ajouter une nouvelle catégorie";
 require '../database.php';
+require '../helpers.php';
 $message = "";
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $titre = htmlspecialchars($_POST['titre']);
-    $resume = htmlspecialchars($_POST['resume']);
-    $description = htmlspecialchars($_POST['description']);
+    $titre = e($_POST['titre']);
+    $resume = e($_POST['resume']);
+    $description = e($_POST['description']);
 
     // Gérer l'image
     $imageData = null;
@@ -29,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $message = "Veuillez sélectionner une image valide.";
     }
 }
-include '../header.php';
+include 'header.php';
 ?>
 
 <div class="container py-5">

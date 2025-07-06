@@ -2,18 +2,19 @@
 session_start();
 $title = "Ajouter un Employer";
 require '../database.php';
+require '../helpers.php';
 
 $message = "";
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    $nom = htmlspecialchars(trim($_POST['nom']));
-    $prenom = htmlspecialchars(trim($_POST['prenom']));
+    $nom = e(trim($_POST['nom']));
+    $prenom = e(trim($_POST['prenom']));
     $email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
-    $tel = htmlspecialchars(trim($_POST['tel']));
-    $adresse = htmlspecialchars(trim($_POST['adresse']));
-    $password = $_POST['password'];
-    $cpassword = $_POST['cpassword'];
+    $tel = e(trim($_POST['tel']));
+    $adresse = e(trim($_POST['adresse']));
+    $password = e($_POST['password']);
+    $cpassword = e($_POST['cpassword']);
     $valide = 1;
     $role = 1;
     $datetime = date("Y-m-d H:i:s");
@@ -65,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 }
-include '../header.php';
+include 'header.php';
 ?>
 <div class="container py-5">
     <div class="row justify-content-center">
@@ -73,7 +74,7 @@ include '../header.php';
             <h2 class="text-center mb-4"><?= $title ?></h2>
 
             <?php if (!empty($message)): ?>
-                <div class="alert alert-danger"><?= htmlspecialchars($message) ?></div>
+                <div class="alert alert-danger"><?= e($message) ?></div>
             <?php endif; ?>
 
             <form method="POST">

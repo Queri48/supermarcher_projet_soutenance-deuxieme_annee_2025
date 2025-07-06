@@ -2,20 +2,21 @@
 session_start();
 $title = "Créer un compte";
 require 'database.php';
+require_once 'helpers.php';
 
 $message = "";
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $nom = htmlspecialchars(trim($_POST['nom']));
-    $prenom = htmlspecialchars(trim($_POST['prenom']));
-    $email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
-    $tel = htmlspecialchars(trim($_POST['tel']));
-    $adresse = htmlspecialchars(trim($_POST['adresse']));
-    $password = $_POST['password'];
-    $cpassword = $_POST['cpassword'];
+    $nom = e(trim($_POST['nom']));
+    $prenom = e(trim($_POST['prenom']));
+    $email = e(filter_var($_POST['email'], FILTER_SANITIZE_EMAIL));
+    $tel = e(trim($_POST['tel']));
+    $adresse = e(trim($_POST['adresse']));
+    $password = e(trim($_POST['password']));
+    $cpassword = e(trim($_POST['cpassword']));
     $valide = 1;
     $role = 2;
-    $datetime = date("Y-m-d H:i:s");
+    $datetime = e(date("Y-m-d H:i:s"));
 
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $message = "Format d'email invalide.";
@@ -124,20 +125,31 @@ include 'header.php';
                     <label for="adresse" class="form-label">Adresse</label>
                     <textarea class="form-control" name="adresse" id="adresse" rows="2" required></textarea>
                 </div>
+                
                 <div class="mb-3">
                     <label for="password" class="form-label">Mot de passe</label>
-                    <input type="password" class="form-control" name="password" id="password" required>
+                    <div class="input-group">
+                        <input type="password" class="form-control" id="password" name="password" required>
+                        <span class="input-group-text bg-white border-start-0 bn" style="background: none;">
+                            <i class="fa fa-eye" id="togglePassword" style="cursor: pointer;"></i>
+                        </span>
+                    </div>
                 </div>
                 <div class="mb-3">
                     <label for="cpassword" class="form-label">Confirmer Mot de passe</label>
+                    <div class="input-group">
                     <input type="password" class="form-control" name="cpassword" id="cpassword" required>
+                        <span class="input-group-text bg-white bn" style="background: none;">
+                            <i class="fa fa-eye" id="togglecPassword" style="cursor: pointer;"></i>
+                        </span>
+                    </div>
                 </div>
 
                 <button type="submit" class="btn btn-primary w-100">S'inscrire</button>
             </form>
 
             <div class="text-center mt-3">
-                <a href="login.php">Déjà un compte ? Se connecter</a>
+                <a href="connexion.php">Déjà un compte ? Se connecter</a>
             </div>
         </div>
     </div>

@@ -39,557 +39,14 @@ $pages = [
     'supprimer_produit.php' => 'Supprimer Produit',
     'account.php' => 'Mon Compte',
 ];
-
-function afficherHeaderParDefaut($currentPage, $isLoggedIn)
+function afficherHeader($role)
 {
-    global $pages;
-?>
-    <ul class="nav justify-content-between align-items-center bg-white px-4 py-2 shadow-sm flex-wrap flex-md-nowrap">
-
-        <li class="nav-item order-md-0">
-            <img src="../images/Logo.png" alt="" class="imgh" style="height: 40px;">
-        </li>
-
-        <li class="nav-item order-0 d-md-none">
-            <a href="<?= $currentPage ?>" class="nav-link active fw-bold text-primary"><?= $pages[$currentPage] ?? 'Accueil' ?></a>
-        </li>
-
-        <li class="nav-item d-none d-md-block">
-            <a href="index.php" class="nav-link <?= ($currentPage == 'index.php') ? 'active fw-bold text-primary' : 'text-dark' ?>"> Accueil</a>
-        </li>
-
-        <li class="d-md-none order-2 ms-auto">
-            <button class="btn btn-outline-secondary" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileMenu" aria-controls="mobileMenu">
-                <i class="fas fa-bars"></i>
-            </button>
-        </li>
-
-        <li class="nav-item d-none d-md-block">
-            <a href="catalogue.php" class="nav-link <?= ($currentPage == 'catalogue.php') ? 'active fw-bold text-primary' : 'text-dark' ?>"><i class="fas fa-list"></i> Catalogue de produits</a>
-        </li>
-
-        <li class="nav-item d-none d-md-block">
-            <a href="promotion.php" class="nav-link <?= ($currentPage == 'promotion.php') ? 'active fw-bold text-primary' : 'text-dark' ?>"><i class="fas fa-gift"></i> Promotions</a>
-        </li>
-
-        <li class="nav-item d-flex align-items-center flex-grow-1 mx-3 order-0" style="max-width: 335px;" id="lirech">
-            <form class="input-group w-100" action="catalogue.php" method="GET">
-                <input class="form-control" type="search" name="recherche" id="recherche" placeholder="Recherche" aria-label="Search" style="height: 45px;">
-                <button class="btn btn-primary d-flex align-items-center justify-content-center" type="submit" style="height: 45px; width: 55px;">
-                    <i class="fas fa-search text-white"></i>
-                </button>
-            </form>
-        </li>
-
-        <li class="nav-item dropdown d-none d-md-block">
-            <a class="nav-link dropdown text-dark" href="#" id="userMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="fas fa-user"></i> Mon Compte
-            </a>
-            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
-                <li><a class="dropdown-item" href="connexion.php">Se connecter</a></li>
-                <li><a class="dropdown-item" href="inscription.php">Créer un compte</a></li>
-            </ul>
-        </li>
-
-        <li class="nav-item d-none d-md-block">
-        </li>
-
-        <li class="nav-item d-none d-md-block">
-            <a href="contact.php" class="nav-link <?= ($currentPage == 'contact.php') ? 'active fw-bold text-primary' : 'text-dark' ?>"><i class="fas fa-phone"></i> Contact</a>
-        </li>
-
-        <li class="nav-item me-2">
-            <a class="nav-link position-relative d-flex align-items-center" data-bs-toggle="offcanvas" href="#offcanvasPanier" role="button" aria-controls="offcanvasPanier">
-                <i class="fas fa-shopping-cart fa-lg"></i>
-                <span class="d-none d-md-inline ms-1">Panier</span>
-                <?php
-                $nbArticles = isset($_SESSION['panier']) ? count($_SESSION['panier']) : 0;
-                echo '<span class="position-absolute top-1 start-60 translate-middle badge rounded-pill bg-danger">' . $nbArticles . '</span>';
-                ?>
-            </a>
-        </li>
-    </ul>
-
-    <!-- Offcanvas menu mobile -->
-    <div class="offcanvas offcanvas-end" tabindex="-1" id="mobileMenu" aria-labelledby="mobileMenuLabel">
-        <div class="offcanvas-header">
-            <h5 id="mobileMenuLabel">Menu</h5>
-            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-        </div>
-        <div class="offcanvas-body">
-            <ul class="nav flex-column">
-                <!-- Ajouter Accueil ici -->
-                <li class="nav-item"><a href="index.php" class="nav-link text-dark"><i class="fas fa-home"></i> Accueil</a></li>
-                <li class="nav-item"><a href="catalogue.php" class="nav-link text-dark"><i class="fas fa-list"></i> Catalogue de produits</a></li>
-                <li class="nav-item"><a href="promotion.php" class="nav-link text-dark"><i class="fas fa-gift"></i> Promotions</a></li>
-                <li class="nav-item"><a href="contact.php" class="nav-link text-dark"><i class="fas fa-phone"></i> Contact</a></li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown text-dark" href="#" id="userMenuMobile" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="fas fa-user"></i> Mon Compte
-                    </a>
-                    <ul class="dropdown-menu" aria-labelledby="userMenuMobile">
-                        <li><a class="dropdown-item" href="connexion.php">Se connecter</a></li>
-                        <li><a class="dropdown-item" href="inscription.php">Créer un compte</a></li>
-                    </ul>
-                </li>
-            </ul>
-        </div>
-    </div>
-
-    <!-- Offcanvas panier -->
-    <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasPanier" aria-labelledby="offcanvasPanierLabel">
-        <div class="offcanvas-header">
-            <h5 id="offcanvasPanierLabel">Votre panier</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
-        </div>
-        <div class="offcanvas-body">
-            <?php
-            require 'database.php';
-            $total = 0;
-
-            if (isset($_SESSION['user_id'])) {
-                $userid = $_SESSION['user_id'];
-                $stmt = $conn->prepare("SELECT p.idpan, a.titre, a.prix, a.image, p.quantite 
-                            FROM panier p 
-                            JOIN article a ON p.idart = a.idart 
-                            WHERE p.id = ?");
-                $stmt->bind_param("i", $userid);
-                $stmt->execute();
-                $result = $stmt->get_result();
-                $panier = $result->fetch_all(MYSQLI_ASSOC);
-            } else {
-                $panier = [];
-
-                if (isset($_SESSION['panier'])) {
-                    foreach ($_SESSION['panier'] as $item) {
-                        $idart = $item['idart'];
-                        $quantite = $item['quantite'];
-
-                        // Récupère les détails de l'article
-                        $stmt = $conn->prepare("SELECT idart, titre, prix, image FROM article WHERE idart = ?");
-                        $stmt->bind_param("i", $idart);
-                        $stmt->execute();
-                        $res = $stmt->get_result();
-                        $article = $res->fetch_assoc();
-
-                        if ($article) {
-                            $article['quantite'] = $quantite;
-                            $panier[] = $article;
-                        }
-                    }
-                }
-            }
-
-            if (empty($panier)) {
-                echo '<p>Votre panier est vide.</p>';
-            } else {
-                foreach ($panier as $produit) {
-                    $titre = e($produit['titre']);
-                    $prix = (float)$produit['prix'];
-                    $quantite = (int)$produit['quantite'];
-                    $totalProduit = $prix * $quantite;
-                    $total += $totalProduit;
-
-                    $image = base64_encode($produit['image']);
-
-                    $idpan = $produit['idpan'] ?? null;
-
-                    echo '
-                    <div class="d-flex align-items-center mb-3 border-bottom pb-2">
-                        <img src="data:image/jpeg;base64,' . $image . '" alt="' . $titre . '" style="width: 60px; height: 60px;" class="me-3 rounded">
-                        <div class="flex-grow-1 w-150">
-                            <h6 class="mb-1">' . $titre . '</h6>
-                            <div class="input-group input-group-sm w-100">
-                                <button class="btn btn-outline-secondary btn-decrease" data-idpan="' . $idpan . '">-</button>
-                                <input type="text" class="form-control text-center qty-input" value="' . $quantite . '" data-idpan="' . $idpan . '" readonly>
-                                <button class="btn btn-outline-secondary btn-increase" data-idpan="' . $idpan . '">+</button>
-                            </div>
-                            <small>Prix unitaire : ' . number_format($prix, 0, ',', ' ') . ' FCFA</small>
-                        </div>
-                        <div class="text-end w-50">
-                            <strong>' . number_format($totalProduit, 0, ',', ' ') . ' FCFA</strong><br>
-                            <a href="supprimer_panier.php?idpan=' . $idpan . '" class="btn btn-sm btn-link text-danger p-0 mt-1" title="Supprimer du panier">
-                                <i class="fas fa-trash-alt"></i>
-                            </a>
-                        </div>
-                    </div>';
-                }
-
-                echo '<hr><div class="d-flex justify-content-between fw-bold mb-3">
-                    <span>Total :</span>
-                    <span>' . number_format($total, 0, ',', ' ') . ' FCFA</span>
-                  </div>';
-            }
-            ?>
-
-            <div class="text-center mt-4">
-                <p class="text-muted">Connectez-vous pour finaliser votre commande :</p>
-                <a href="connexion.php" class="btn btn-primary w-100 mb-2">Se connecter</a>
-                <a href="inscription.php" class="btn btn-outline-secondary w-100">Créer un compte</a>
-            </div>
-        </div>
-    </div>
-
-<?php
-}
-
-function afficherHeaderclient($currentPage, $isLoggedIn)
-{
-    global $pages;
-?>
-    <ul class="nav justify-content-between align-items-center bg-white px-2 py-2 shadow-sm flex-wrap flex-md-nowrap">
-
-        <li class="nav-item order-md-0">
-            <img src="../images/Logo.png" alt="" class="imgh" style="height: 40px;">
-        </li>
-
-        <li class="nav-item order-0 d-md-none">
-            <a href="<?= $currentPage ?>" class="nav-link active fw-bold text-primary"><?= $pages[$currentPage] ?? 'Accueil' ?></a>
-        </li>
-
-        <li class="nav-item d-none d-md-block">
-            <a href="index.php" class="nav-link <?= ($currentPage == 'index.php') ? 'active fw-bold text-primary' : 'text-dark' ?>">Accueil</a>
-        </li>
-
-        <li class="d-md-none order-2 ms-auto">
-            <button class="btn btn-outline-secondary" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileMenu" aria-controls="mobileMenu">
-                <i class="fas fa-bars"></i>
-            </button>
-        </li>
-
-        <li class="nav-item d-none d-md-block">
-            <a href="catalogue.php" class="nav-link <?= ($currentPage == 'catalogue.php') ? 'active fw-bold text-primary' : 'text-dark' ?>"><i class="fas fa-list"></i> Catalogue de produits</a>
-        </li>
-
-        <li class="nav-item d-none d-md-block">
-            <a href="promotion.php" class="nav-link <?= ($currentPage == 'promotion.php') ? 'active fw-bold text-primary' : 'text-dark' ?>"><i class="fas fa-gift"></i> Promotions</a>
-        </li>
-
-        <li class="nav-item d-flex align-items-center flex-grow-1 mx-3 order-0" style="max-width: 245px;" id="lirech">
-            <form class="input-group w-100" action="catalogue.php" method="GET">
-                <input class="form-control" type="search" name="recherche" id="recherche" placeholder="Recherche" aria-label="Search" style="height: 45px;">
-                <button class="btn btn-primary d-flex align-items-center justify-content-center" type="submit" style="height: 45px; width: 55px;">
-                    <i class="fas fa-search text-white"></i>
-                </button>
-            </form>
-        </li>
-
-        <li class="nav-item dropdown d-none d-md-block">
-            <a class="nav-link dropdown text-dark btn btn-primary text-white fw-bold" href="#" id="userMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="fas fa-user-circle"></i></i> Mon Compte
-            </a>
-            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
-                <li><a class="dropdown-item" href="account.php">Paramètres du compte</a></li>
-                <li>
-                    <hr class="dropdown-divider">
-                </li>
-                <li><a class="dropdown-item" href="logout.php">Se déconnecter</a></li>
-            </ul>
-        </li>
-        <li class="nav-item d-none d-md-block">
-            <a href="historique.php" class="nav-link <?= ($currentPage == 'historique.php') ? 'active fw-bold text-primary' : 'text-dark' ?>"><i class="fas fa-history"></i> Historique</a>
-        </li>
-
-        <li class="nav-item d-none d-md-block">
-            <a href="contact.php" class="nav-link <?= ($currentPage == 'contact.php') ? 'active fw-bold text-primary' : 'text-dark' ?>"><i class="fas fa-phone"></i> Contact</a>
-        </li>
-
-        <li class="nav-item me-2">
-            <a class="nav-link position-relative d-flex align-items-center" data-bs-toggle="offcanvas" href="#offcanvasPanier" role="button" aria-controls="offcanvasPanier">
-                <i class="fas fa-shopping-cart fa-lg"></i>
-                <span class="d-none d-md-inline ms-1">Panier</span>
-                <?php
-                require 'database.php'; // pour $conn
-
-                $nbArticles = 0;
-                if (isset($_SESSION['user_id'])) {
-                    $userid = $_SESSION['user_id'];
-                    $stmt = $conn->prepare("SELECT SUM(quantite) as total FROM panier WHERE id = ?");
-                    $stmt->bind_param("i", $userid);
-                    $stmt->execute();
-                    $result = $stmt->get_result();
-                    $row = $result->fetch_assoc();
-                    $nbArticles = $row['total'] ?? 0;
-                } elseif (isset($_SESSION['panier'])) {
-                    // pour non connecté, compter articles dans session
-                    $nbArticles = count($_SESSION['panier']);
-                }
-
-                echo '<span class="position-absolute top-1 start-60 translate-middle badge rounded-pill bg-danger">' . $nbArticles . '</span>';
-                ?>
-
-            </a>
-        </li>
-    </ul>
-
-    <!-- Offcanvas menu mobile -->
-    <div class="offcanvas offcanvas-end" tabindex="-1" id="mobileMenu" aria-labelledby="mobileMenuLabel">
-        <div class="offcanvas-header">
-            <h5 id="mobileMenuLabel">Menu</h5>
-            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-        </div>
-        <div class="offcanvas-body">
-            <ul class="nav flex-column">
-                <!-- Ajouter Accueil ici -->
-                <li class="nav-item"><a href="index.php" class="nav-link text-dark"><i class="fas fa-home"></i> Accueil</a></li>
-                <li class="nav-item"><a href="catalogue.php" class="nav-link text-dark"><i class="fas fa-list"></i> Catalogue de produits</a></li>
-                <li class="nav-item"><a href="promotion.php" class="nav-link text-dark"><i class="fas fa-gift"></i> Promotions</a></li>
-                <li class="nav-item"><a href="historique.php" class="nav-link text-dark"><i class="fas fa-history"></i> Historique</a></li>
-                <li class="nav-item"><a href="contact.php" class="nav-link text-dark"><i class="fas fa-phone"></i> Contact</a></li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown text-dark" href="#" id="userMenuMobile" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="fas fa-user-circle"></i> Mon Compte
-                    </a>
-                    <ul class="dropdown-menu" aria-labelledby="userMenuMobile">
-                        <li><a class="dropdown-item" href="account.php">Paramètres du compte</a></li>
-                        <li>
-                            <hr class="dropdown-divider">
-                        </li>
-                        <li><a class="dropdown-item" href="logout.php">Se déconnecter</a></li>
-                    </ul>
-                </li>
-            </ul>
-        </div>
-    </div>
-
-    <!-- Offcanvas panier -->
-    <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasPanier" aria-labelledby="offcanvasPanierLabel">
-        <div class="offcanvas-header">
-            <h5 id="offcanvasPanierLabel">Votre panier</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
-        </div>
-        <div class="offcanvas-body">
-            <?php
-            require 'database.php';
-            $total = 0;
-
-            if (isset($_SESSION['user_id'])) {
-                $userid = $_SESSION['user_id'];
-                $stmt = $conn->prepare("SELECT p.idpan, a.titre, a.prix, a.image, p.quantite 
-                            FROM panier p 
-                            JOIN article a ON p.idart = a.idart 
-                            WHERE p.id = ?");
-                $stmt->bind_param("i", $userid);
-                $stmt->execute();
-                $result = $stmt->get_result();
-                $panier = $result->fetch_all(MYSQLI_ASSOC);
-            } else {
-                $panier = [];
-
-                if (isset($_SESSION['panier'])) {
-                    foreach ($_SESSION['panier'] as $item) {
-                        $idart = $item['idart'];
-                        $quantite = $item['quantite'];
-
-                        // Récupère les détails de l'article
-                        $stmt = $conn->prepare("SELECT idart, titre, prix, image FROM article WHERE idart = ?");
-                        $stmt->bind_param("i", $idart);
-                        $stmt->execute();
-                        $res = $stmt->get_result();
-                        $article = $res->fetch_assoc();
-
-                        if ($article) {
-                            $article['quantite'] = $quantite;
-                            $panier[] = $article;
-                        }
-                    }
-                }
-            }
-
-            if (empty($panier)) {
-                echo '<p>Votre panier est vide.</p>';
-            } else {
-                foreach ($panier as $produit) {
-                    $titre = e($produit['titre']);
-                    $prix = (float)$produit['prix'];
-                    $quantite = (int)$produit['quantite'];
-                    $totalProduit = $prix * $quantite;
-                    $total += $totalProduit;
-
-                    $image = base64_encode($produit['image']);
-
-                    $idpan = $produit['idpan'] ?? null;
-
-                    echo '
-                    <div class="d-flex align-items-center mb-3 border-bottom pb-2">
-                        <img src="data:image/jpeg;base64,' . $image . '" alt="' . $titre . '" style="width: 60px; height: 60px;" class="me-3 rounded">
-                        <div class="flex-grow-1 w-150">
-                            <h6 class="mb-1">' . $titre . '</h6>
-                            <div class="input-group input-group-sm w-100">
-                                <button class="btn btn-outline-secondary btn-decrease" data-idpan="' . $idpan . '">-</button>
-                                <input type="text" class="form-control text-center qty-input" value="' . $quantite . '" data-idpan="' . $idpan . '" readonly>
-                                <button class="btn btn-outline-secondary btn-increase" data-idpan="' . $idpan . '">+</button>
-                            </div>
-                            <small>Prix unitaire : ' . number_format($prix, 0, ',', ' ') . ' FCFA</small>
-                        </div>
-                        <div class="text-end w-50">
-                            <strong>' . number_format($totalProduit, 0, ',', ' ') . ' FCFA</strong><br>
-                            <a href="supprimer_panier.php?idpan=' . $idpan . '" class="btn btn-sm btn-link text-danger p-0 mt-1" title="Supprimer du panier">
-                                <i class="fas fa-trash-alt"></i>
-                            </a>
-                        </div>
-                    </div>';
-                }
-
-                echo '<hr><div class="d-flex justify-content-between fw-bold mb-3">
-                    <span>Total :</span>
-                    <span>' . number_format($total, 0, ',', ' ') . ' FCFA</span>
-                  </div>';
-            }
-            ?>
-
-            <div class="text-center mt-4">
-                <a href="commander.php" class="btn btn-success w-100">Commander</a>
-            </div>
-        </div>
-    </div>
-
-<?php
-}
-
-function afficherHeaderadmin($currentPage, $isLoggedIn)
-{
-    global $pages;
-?>
-    <ul class="nav justify-content-between align-items-center bg-white px-4 py-2 shadow-sm flex-wrap flex-md-nowrap">
-
-        <li class="nav-item order-md-0">
-            <img src="../../images/Logo.png" alt="" class="imgh" style="height: 40px;">
-        </li>
-
-        <li class="nav-item order-0 d-md-none">
-            <a href="<?= $currentPage ?>" class="nav-link active fw-bold text-primary"><?= $pages[$currentPage] ?? 'Accueil' ?></a>
-        </li>
-
-        <li class="nav-item d-none d-md-block">
-            <a href="tableau_bord.php" class="nav-link <?= ($currentPage == 'tableau_bord.php') ? 'active fw-bold text-primary' : 'text-dark' ?>"><i class="fas fa-tachometer-alt"></i> Tableau de bord</a>
-        </li>
-
-        <li class="d-md-none order-2 ms-auto">
-            <button class="btn btn-outline-secondary" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileMenu" aria-controls="mobileMenu">
-                <i class="fas fa-bars"></i>
-            </button>
-        </li>
-
-        <li class="nav-item d-none d-md-block">
-            <a href="client.php" class="nav-link <?= ($currentPage == 'client.php') ? 'active fw-bold text-primary' : 'text-dark' ?>"><i class="fas fa-users"></i> Client</a>
-        </li>
-
-        <li class="nav-item d-none d-md-block">
-            <a href="categorie.php" class="nav-link <?= ($currentPage == 'categorie.php') ? 'active fw-bold text-primary' : 'text-dark' ?>"><i class="fas fa-list"></i> Catégorie</a>
-        </li>
-
-        <li class="nav-item d-none d-md-block">
-            <a href="produit.php" class="nav-link <?= ($currentPage == 'produit.php') ? 'active fw-bold text-primary' : 'text-dark' ?>"><i class="fas fa-cubes"></i> Produit</a>
-        </li>
-
-        <li class="nav-item d-none d-md-block">
-            <a href="promotion.php" class="nav-link <?= ($currentPage == 'promotion.php') ? 'active fw-bold text-primary' : 'text-dark' ?>"><i class="fas fa-gift"></i> Promotion</a>
-        </li>
-
-        <li class="nav-item d-none d-md-block">
-            <a href="contact.php" class="nav-link <?= ($currentPage == 'contact.php') ? 'active fw-bold text-primary' : 'text-dark' ?>"><i class="fas fa-phone"></i> Contact</a>
-        </li>
-
-        <li class="nav-item d-none d-md-block">
-            <a href="commande.php" class="nav-link <?= ($currentPage == 'commande.php') ? 'active fw-bold text-primary' : 'text-dark' ?>"><i class="fas fa-clipboard-list"></i> Commande</a>
-        </li>
-
-        <li class="nav-item dropdown d-none d-md-block">
-            <a class="nav-link dropdown text-white  btn btn-primary" href="#" id="userMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="fas fa-cog"></i> Paramètres
-            </a>
-            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
-                <li><a class="dropdown-item" href="administrateur.php">Ajouter compte administrateur</a></li>
-                <li>
-                    <hr class="dropdown-divider">
-                </li>
-                <li><a class="dropdown-item" href="employer.php">Ajouter compte employé</a></li>
-                <li>
-                    <hr class="dropdown-divider">
-                </li>
-                <li><a class="dropdown-item" href="account.php">Paramètres du compte</a></li>
-                <li>
-                    <hr class="dropdown-divider">
-                </li>
-                <li><a class="dropdown-item" href="logout.php">Se déconnecter</a></li>
-            </ul>
-        </li>
-
-        <li class="nav-item d-flex align-items-center flex-grow-1 mx-1 order-0" style="max-width: 160px;" id="lirech">
-            <form class="input-group w-100" action="catalogue.php" method="GET">
-                <input class="form-control" type="search" name="recherche" id="recherche" placeholder="Recherche" aria-label="Search" style="height: 45px;">
-                <button class="btn btn-primary d-flex align-items-center justify-content-center" type="submit" style="height: 45px; width: 45px;">
-                    <i class="fas fa-search text-white"></i>
-                </button>
-            </form>
-        </li>
-
-        <li class="nav-item d-none d-md-block">
-        </li>
-    </ul>
-
-    <!-- Offcanvas menu mobile -->
-    <div class="offcanvas offcanvas-end" tabindex="-1" id="mobileMenu" aria-labelledby="mobileMenuLabel">
-        <div class="offcanvas-header">
-            <h5 id="mobileMenuLabel">Menu</h5>
-            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-        </div>
-        <div class="offcanvas-body">
-            <ul class="nav flex-column">
-                <!-- Ajouter Accueil ici -->
-                <li class="nav-item"><a href="tableau_bord.php" class="nav-link text-dark"><i class="fas fa-tachometer-alt"></i> Tableau de bord</a></li>
-                <li class="nav-item"><a href="client.php" class="nav-link text-dark"><i class="fas fa-users"></i> Client</a></li>
-                <li class="nav-item"><a href="categorie.php" class="nav-link text-dark"><i class="fas fa-list"></i> Catégorie</a></li>
-                <li class="nav-item"><a href="produit.php" class="nav-link text-dark"><i class="fas fa-cubes"></i> Produit</a></li>
-                <li class="nav-item"><a href="promotion.php" class="nav-link text-dark"><i class="fas fa-gift"></i> Promotion</a></li>
-                <li class="nav-item"><a href="contact.php" class="nav-link text-dark"><i class="fas fa-phone"></i> Contact</a></li>
-                <li class="nav-item"><a href="commande.php" class="nav-link text-dark"><i class="fas fa-clipboard-list"></i> Commande</a></li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown text-dark" href="#" id="userMenuMobile" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="fas fa-cog"></i> Parametres
-                    </a>
-                    <ul class="dropdown-menu" aria-labelledby="userMenuMobile">
-                        <li><a class="dropdown-item" href="administrateur.php">Ajouter compte administrateur</a></li>
-                        <li>
-                            <hr class="dropdown-divider">
-                        </li>
-                        <li><a class="dropdown-item" href="employer.php">Ajouter compte employé</a></li>
-                        <li>
-                            <hr class="dropdown-divider">
-                        </li>
-                        <li><a class="dropdown-item" href="account.php">Paramètres du compte</a></li>
-                        <li>
-                            <hr class="dropdown-divider">
-                        </li>
-                        <li><a class="dropdown-item" href="../logout.php">Se déconnecter</a></li>
-                    </ul>
-                </li>
-            </ul>
-        </div>
-    </div>
-<?php
-}
-
-// Fonction pour inclure le header selon le rôle
-function includeHeaderByRole($role)
-{
-    switch ($role) {
-        case '0':
-            global $currentPage, $isLoggedIn;
-            afficherHeaderadmin($currentPage, $isLoggedIn);
-            break;
-        case '1':
-            include 'header_employe.php';
-            break;
-        case '2':
-            global $currentPage, $isLoggedIn;
-            afficherHeaderclient($currentPage, $isLoggedIn);
-            break;
-        default:
-            global $currentPage, $isLoggedIn;
-            afficherHeaderParDefaut($currentPage, $isLoggedIn);
-            break;
+    if ($role === 2) {
+        global $currentPage, $isLoggedIn;
+        include 'headerc.php'; // Client
+    } else {
+        global $currentPage, $isLoggedIn;
+        include 'headerv.php'; // Visiteur
     }
 }
 ?>
@@ -602,12 +59,9 @@ function includeHeaderByRole($role)
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= e($title ?? "Super U") ?></title>
     <link rel="stylesheet" href="../bootstrap-5.3.3-dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="../../bootstrap-5.3.3-dist/css/bootstrap.min.css">
     <script src="../bootstrap-5.3.3-dist/js/bootstrap.bundle.min.js"></script>
-    <script src="../../bootstrap-5.3.3-dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD2poYy7oT65mFuxSJNjhoA8Ozg7NBJvHI&callback=initMap" async defer></script>
     <link rel="stylesheet" href="../fontawesome-free-6.7.2-web/css/all.min.css">
-    <link rel="stylesheet" href="../../fontawesome-free-6.7.2-web/css/all.min.css">
 
     <style>
         @media (max-width: 768px) {
@@ -649,10 +103,135 @@ function includeHeaderByRole($role)
         body .text-primary {
             color: var(--bs-primary) !important;
         }
+
+        .text-superu {
+            color: #007d8f !important;
+        }
+
+        .text-superu .nav-link {
+            color: #007d8f !important;
+        }
+
+        .btn-superu {
+            background-color: #007d8f;
+            color: #fff;
+            border: 2px solid #007d8f;
+            transition: all 0.3s ease;
+            border-radius: 30px;
+        }
+
+        .btn-superu:hover,
+        .btn-superu:focus {
+            background-color: transparent;
+            color: #fff;
+            border-color: #fff;
+        }
+
+        .text-white-important {
+            color: #ffffff !important;
+        }
+
+        .overlay {
+            background-color: rgba(0, 0, 0, 0.25);
+            /* noir avec 50% d’opacité */
+            z-index: 1;
+        }
+
+        #carouselImageContainer {
+            z-index: 1;
+        }
+
+        .carousel-caption {
+            z-index: 2;
+        }
+
+        .carousel-background {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+            z-index: 0;
+        }
+
+        .carousel-background.active {
+            opacity: 1;
+        }
+
+        .carousel-caption {
+            z-index: 1;
+        }
+
+        #customHeroCarousel {
+            height: 400px;
+        }
+
+        @media (max-width: 768px) {
+            #customHeroCarousel {
+                height: 250px;
+            }
+
+            .carousel-caption {
+                bottom: 30px !important;
+                padding: 0 15px;
+            }
+
+            .carousel-caption h1 {
+                font-size: 1.4rem;
+            }
+
+            .carousel-caption p {
+                font-size: 1rem;
+            }
+
+            .carousel-caption a.btn {
+                font-size: 0.9rem;
+                padding: 10px 20px;
+            }
+        }
+
+        /* Catégories, Produits & Promotions */
+        .card-img-top {
+            height: 200px;
+            object-fit: cover;
+        }
+
+        @media (max-width: 576px) {
+            .card-img-top {
+                height: 160px;
+            }
+
+            .card-title {
+                font-size: 1rem;
+            }
+
+            .card-text {
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .row.text-center .col-md-4 {
+                margin-bottom: 20px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .container {
+                padding-left: 10px;
+                padding-right: 10px;
+            }
+        }
+
+        .btn {
+            white-space: nowrap;
+        }
     </style>
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
+            // 🎯 Gestion boutons +/-
             const buttons = document.querySelectorAll(".btn-decrease, .btn-increase");
 
             buttons.forEach(button => {
@@ -683,11 +262,42 @@ function includeHeaderByRole($role)
                 });
             });
 
-            // ➕ Recharge la page après fermeture de l'offcanvas
+            // 🔄 Reload page après fermeture offcanvas
             const offcanvas = document.getElementById('offcanvasPanier');
-            offcanvas.addEventListener('hidden.bs.offcanvas', function() {
-                location.reload();
-            });
+            if (offcanvas) {
+                offcanvas.addEventListener('hidden.bs.offcanvas', function() {
+                    location.reload();
+                });
+            }
+
+            // 👁️ Afficher/Masquer mot de passe
+            const toggleIcon = document.getElementById("togglePassword");
+            const passwordInput = document.getElementById("password");
+
+            if (toggleIcon && passwordInput) {
+                toggleIcon.addEventListener("click", function() {
+                    const isPassword = passwordInput.type === "password";
+                    passwordInput.type = isPassword ? "text" : "password";
+
+                    this.classList.toggle("fa-eye");
+                    this.classList.toggle("fa-eye-slash");
+                });
+            }
+
+            // 👁️ Afficher/Masquer confirmer mot de passe
+            const ctoggleIcon = document.getElementById("togglecPassword");
+            const cpasswordInput = document.getElementById("cpassword");
+
+            if (ctoggleIcon && cpasswordInput) {
+                ctoggleIcon.addEventListener("click", function() {
+                    const isPassword = cpasswordInput.type === "password";
+                    cpasswordInput.type = isPassword ? "text" : "password";
+
+                    this.classList.toggle("fa-eye");
+                    this.classList.toggle("fa-eye-slash");
+                });
+            }
+
         });
     </script>
 
@@ -736,17 +346,43 @@ function includeHeaderByRole($role)
         }
     </script>
 
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const imagePaths = [
+                "../images/SuperUI2.jpg",
+                "../images/SuperUI1.jpg",
+                "../images/SuperUE2.jpg",
+                "../images/SuperUE1.jpg"
+            ];
+
+            const container = document.getElementById("carouselImageContainer");
+
+            imagePaths.forEach((src, index) => {
+                const img = document.createElement("img");
+                img.src = src;
+                img.alt = `Image ${index + 1}`;
+                img.className = "carousel-background";
+                if (index === 0) img.classList.add("active");
+                container.appendChild(img);
+            });
+
+            const images = container.querySelectorAll(".carousel-background");
+            let currentIndex = 0;
+            const interval = 5000; // 5 secondes
+
+            setInterval(() => {
+                images[currentIndex].classList.remove("active");
+                currentIndex = (currentIndex + 1) % images.length;
+                images[currentIndex].classList.add("active");
+            }, interval);
+        });
+    </script>
+
 </head>
 
 <body>
     <header>
-        <?php
-        if ($isLoggedIn) {
-            includeHeaderByRole($userRole);
-        } else {
-            afficherHeaderParDefaut($currentPage, $isLoggedIn);
-        }
-        ?>
+        <?php afficherHeader($isLoggedIn ? $userRole : null); ?>
     </header>
 </body>
 

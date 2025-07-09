@@ -382,7 +382,20 @@ function afficherHeader($role)
 
 <body>
     <header>
-        <?php afficherHeader($isLoggedIn ? $userRole : null); ?>
+        <?php afficherHeader($isLoggedIn ? $userRole : null);
+        if (isset($_SESSION['success_message'])): ?>
+            <div id="notif" class="alert alert-success text-center position-fixed top-0 start-50 translate-middle-x mt-2 shadow text-superu" style="z-index: 1050;">
+                <?= e($_SESSION['success_message']) ?>
+            </div>
+            <script>
+                setTimeout(function() {
+                    const notif = document.getElementById('notif');
+                    if (notif) notif.remove();
+                }, 3000); // disparaît après 3 secondes
+            </script>
+            <?php unset($_SESSION['success_message']); ?>
+        <?php endif; ?>
+
     </header>
 </body>
 

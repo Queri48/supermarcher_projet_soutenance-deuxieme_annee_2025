@@ -15,14 +15,10 @@ $stmt->close();
 <div class="container py-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="h3"><?= e($title) ?></h1>
-        <li class="nav-item d-flex align-items-center flex-grow-1 mx-1 order-0" style="max-width: 160px;" id="lirech">
-            <form class="input-group w-100" action="catalogue.php" method="GET">
-                <input class="form-control" type="search" name="recherche" id="recherche" placeholder="Recherche" aria-label="Search" style="height: 38px;">
-                <button class="btn btn-primary d-flex align-items-center justify-content-center" type="submit" style="height: 38px; width: 45px;">
-                    <i class="fas fa-search text-white"></i>
-                </button>
-            </form>
-        </li>
+    </div>
+
+    <div class="mb-3">
+        <input type="text" id="rechercheCode" class="form-control" placeholder="Rechercher par client...">
     </div>
 
     <div class="table-responsive shadow-sm bg-white rounded p-3">
@@ -86,3 +82,25 @@ $stmt->close();
         </table>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const input = document.getElementById('rechercheCode');
+    if (!input) return;
+
+    input.addEventListener('input', function () {
+        const filter = this.value.trim().toLowerCase();
+        const rows = document.querySelectorAll('table tbody tr');
+
+        rows.forEach(function (row) {
+            const nom     = row.querySelector('td:nth-child(2)')?.innerText.toLowerCase() || '';
+            const prenom  = row.querySelector('td:nth-child(3)')?.innerText.toLowerCase() || '';
+            const email   = row.querySelector('td:nth-child(4)')?.innerText.toLowerCase() || '';
+            const tel     = row.querySelector('td:nth-child(5)')?.innerText.toLowerCase() || '';
+
+            const match = nom.includes(filter) || prenom.includes(filter) || email.includes(filter) || tel.includes(filter);
+            row.style.display = match ? '' : 'none';
+        });
+    });
+});
+</script>

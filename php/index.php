@@ -48,7 +48,7 @@ $promotions = $promoStmt->fetch_all(MYSQLI_ASSOC);
     <div class="row flex-nowrap overflow-auto g-4">
         <?php foreach ($categories as $cat): ?>
             <div class="col-6 col-md-2 text-center">
-                <a href="catalogue.php?cat=<?= $cat['idcat'] ?>" class="text-decoration-none text-dark">
+                <a href="produit.php?idart=<?= $cat['idcat'] ?>" class="text-decoration-none text-dark">
                     <img src="data:image/jpeg;base64,<?= base64_encode($cat['image']) ?>" class="img-fluid rounded shadow-sm" alt="<?= e($cat['titre']) ?>" />
                     <h5 class="mt-2"><?= e($cat['titre']) ?></h5>
                 </a>
@@ -71,7 +71,7 @@ $promotions = $promoStmt->fetch_all(MYSQLI_ASSOC);
                     <div class="card-body">
                         <h5 class="card-title"><?= e($prod['titre']) ?></h5>
                         <p class="card-text"><?= e($prod['resume']) ?></p>
-                        <a href="produit.php?id=<?= $prod['idart'] ?>" class="btn btn-outline-success">
+                        <a href="ajouter_panier.php?idart=<?= $prod['idart'] ?>" class="btn btn-outline-success">
                             <i class="fas fa-shopping-cart"></i> Commander
                         </a>
                     </div>
@@ -94,7 +94,7 @@ $promotions = $promoStmt->fetch_all(MYSQLI_ASSOC);
                     <div class="card-body">
                         <h5 class="card-title"><?= e($promo['titre']) ?> <span class="badge bg-danger"><?= $promo['pourcentage'] ?>%</span></h5>
                         <p class="card-text"><?= e($promo['description']) ?></p>
-                        <a href="produit.php?id=<?= $promo['idart'] ?>" class="btn btn-outline-danger">
+                        <a href="produit.php?idart=<?= $promo['idart'] ?>" class="btn btn-outline-danger">
                             <i class="fas fa-tags"></i> Profiter
                         </a>
                     </div>

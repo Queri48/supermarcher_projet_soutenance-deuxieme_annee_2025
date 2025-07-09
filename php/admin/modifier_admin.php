@@ -33,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (!empty($password)) {
         $password_hash = password_hash($password, PASSWORD_DEFAULT);
-        $stmt = $conn->prepare("UPDATE utilisateur SET nom=?, prenom=?, email=?, tel=?, adresse=?, password=?, valide=?, role=?WHERE id=?");
+        $stmt = $conn->prepare("UPDATE utilisateur SET nom=?, prenom=?, email=?, tel=?, adresse=?, password=?, valide=?, role=? WHERE id=?");
         $stmt->bind_param("ssssssisi", $nom, $prenom, $email, $tel, $adresse, $password_hash, $valide, $role, $id);
     } else {
         $stmt = $conn->prepare("UPDATE utilisateur SET nom=?, prenom=?, email=?, tel=?, adresse=?, valide=?, role=? WHERE id=?");

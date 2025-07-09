@@ -59,6 +59,7 @@ if (isset($_SESSION['user_id']) ) {
             break;
         }
     }
+    unset($item); // <-- Très important pour casser la référence
 
     if (!$found) {
         $_SESSION['panier'][] = [
@@ -69,6 +70,8 @@ if (isset($_SESSION['user_id']) ) {
 }
 
 $stmt->close();
+
+$_SESSION['success_message'] = "Produit ajouté au panier !";
 
 // Redirection
 $referer = $_SERVER['HTTP_REFERER'] ?? 'index.php';

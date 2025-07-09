@@ -4,7 +4,6 @@ $title = "Tableau de bord - Super U Bénin";
 require '../database.php';
 include 'header.php';
 
-// Requêtes pour les statistiques
 $nbProduits    = $conn->query("SELECT COUNT(*) FROM article")->fetch_row()[0];
 $nbCategories  = $conn->query("SELECT COUNT(*) FROM categorie")->fetch_row()[0];
 $nbUtilisateurs = $conn->query("SELECT COUNT(*) FROM utilisateur")->fetch_row()[0];
@@ -14,7 +13,6 @@ $nbCommandes   = $conn->query("SELECT COUNT(*) FROM commande")->fetch_row()[0];
 <div class="container py-5">
     <h1 class="mb-5 text-center text-primary"><i class="fas fa-tools me-2"></i>Tableau de bord de l'administrateur</h1>
 
-    <!-- Statistiques -->
     <div class="row row-cols-1 row-cols-md-4 g-4 mb-5">
         <div class="col">
             <div class="card text-white bg-success shadow-sm">
@@ -54,7 +52,6 @@ $nbCommandes   = $conn->query("SELECT COUNT(*) FROM commande")->fetch_row()[0];
         </div>
     </div>
 
-    <!-- Actions rapides -->
     <div class="row g-4 mb-4">
         <div class="col-md-3">
             <a href="ajouter_produit.php" class="btn btn-outline-primary w-100 py-3">
@@ -72,7 +69,7 @@ $nbCommandes   = $conn->query("SELECT COUNT(*) FROM commande")->fetch_row()[0];
             </a>
         </div>
         <div class="col-md-3">
-            <a href="commandes.php" class="btn btn-outline-success w-100 py-3">
+            <a href="commande.php" class="btn btn-outline-success w-100 py-3">
                 <i class="fas fa-file-invoice me-1"></i> Voir les commandes
             </a>
         </div>

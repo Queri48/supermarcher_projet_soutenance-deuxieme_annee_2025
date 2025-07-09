@@ -38,7 +38,7 @@
 
     <li class="nav-item dropdown d-none d-md-block text-superu">
         <a class="nav-link text-white-important fw-bold text-superu" href="#" id="userMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            <i class="fas fa-user-circle"></i>
+            <i class="fas fa-user-circle text-primary fw-bold"></i>
             <?php
             require 'database.php'; // pour $conn
             if (isset($_SESSION['user_id'])) {

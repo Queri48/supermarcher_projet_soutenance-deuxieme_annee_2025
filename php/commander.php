@@ -4,7 +4,7 @@ require 'database.php';
 require_once 'helpers.php';
 
 if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
+    header("Location: connexion.php");
     exit;
 }
 

@@ -43,7 +43,7 @@
             require 'database.php'; // pour $conn
             if (isset($_SESSION['user_id'])) {
                 $userid = $_SESSION['user_id'];
-                $stmt = $conn->prepare("SELECT CONCAT(nom, ' ', prenom) AS fullname FROM Utilisateur WHERE id = ?");
+                $stmt = $conn->prepare("SELECT CONCAT(nom, ' ', prenom) AS fullname FROM utilisateur WHERE id = ?");
                 $stmt->bind_param("i", $userid);
                 $stmt->execute();
                 $result = $stmt->get_result();

@@ -1,9 +1,9 @@
 <?php
-$servername = "hopper.proxy.rlwy.net";
+$servername = "shortline.proxy.rlwy.net";
 $username = "root";
-$password = "wYXxwvIzwxUsGqNRlsTmKfUXlacdfsQb";
+$password = "SrsirYBpcnNIzJuRMbeBtrkufPyXwUHD";
 $dbname = "railway";
-$port = 22983; // Ne pas oublier le port
+$port = 19158; // Ne pas oublier le port
 
 $conn = new mysqli($servername, $username, $password, $dbname, $port);
 

@@ -1,9 +1,9 @@
 <?php
-$servername = "mysql.railway.internal";
+$servername = "maglev.proxy.rlwy.net";
 $username = "root";
 $password = "nQQHxQIyMWGARWkzZCZxrRypBRryeSkG";
 $dbname = "railway";
-$port = 3306;
+$port = 31497;
 
 $conn = new mysqli($servername, $username, $password, $dbname, $port);
 

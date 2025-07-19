@@ -1,9 +1,9 @@
 <?php
-$servername = "maglev.proxy.rlwy.net";
+$servername = "hopper.proxy.rlwy.net";
 $username = "root";
-$password = "nQQHxQIyMWGARWkzZCZxrRypBRryeSkG";
+$password = "wYXxwvIzwxUsGqNRlsTmKfUXlacdfsQb";
 $dbname = "railway";
-$port = 31497;
+$port = 22983; // Ne pas oublier le port
 
 $conn = new mysqli($servername, $username, $password, $dbname, $port);
 

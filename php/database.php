@@ -1,10 +1,11 @@
 <?php
-$servername = "localhost";
+$servername = "mysql.railway.internal";
 $username = "root";
-$password = "";
-$dbname = "supermarcher";
+$password = "nQQHxQIyMWGARWkzZCZxrRypBRryeSkG";
+$dbname = "railway";
+$port = 3306;
 
-$conn = new mysqli($servername, $username, $password, $dbname);
+$conn = new mysqli($servername, $username, $password, $dbname, $port);
 
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
